@@ -1,0 +1,175 @@
+name: Release Octopus
+
+# Builds the Octopus Mac app from a tag of serafo27/octopus and publishes it as a GitHub Release of this
+# repository, where the site's download button finds it.
+#
+# Started by:
+#   - the octopus repository, when a tag `v*` is pushed (its notify-release workflow sends a
+#     `repository_dispatch` of type `octopus-tag` with `client_payload.tag`);
+#   - by hand: Actions › Release Octopus › Run workflow, with the tag.
+#
+# Secrets (Settings › Secrets and variables › Actions):
+#   OCTOPUS_REPO_TOKEN          read access to serafo27/octopus (fine-grained token, Contents: read).
+#                               Not needed while that repository is public.
+#   APPLE_CERTIFICATE           optional: base64 of the Developer ID Application .p12
+#   APPLE_CERTIFICATE_PASSWORD  optional: the .p12's password
+#   APPLE_SIGNING_IDENTITY      optional: "Developer ID Application: Name (TEAMID)"
+#   APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID
+#                               optional: notarization (APPLE_PASSWORD is an app-specific password)
+# Without the Apple secrets the app is signed ad hoc: it runs, but Gatekeeper asks the user to allow it.
+
+on:
+  repository_dispatch:
+    types: [octopus-tag]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag of serafo27/octopus to build (e.g. v0.2.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  TAG: ${{ github.event.client_payload.tag || inputs.tag }}
+  SOURCE_REPO: serafo27/octopus
+
+concurrency:
+  group: release-${{ github.event.client_payload.tag || inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build and publish ${{ github.event.client_payload.tag || inputs.tag }}
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - name: Check the tag
+        run: |
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::'$TAG' isn't a version tag like v1.2.3"
+            exit 1
+          fi
+          echo "VERSION=${TAG#v}" >> "$GITHUB_ENV"
+
+      - name: Check out Octopus at ${{ env.TAG }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.SOURCE_REPO }}
+          ref: refs/tags/${{ env.TAG }}
+          path: octopus
+          fetch-depth: 0
+          token: ${{ secrets.OCTOPUS_REPO_TOKEN || github.token }}
+
+      - name: Check the app's version matches the tag
+        working-directory: octopus
+        run: |
+          app=$(node -p "require('./src-tauri/tauri.conf.json').version")
+          if [ "$app" != "$VERSION" ]; then
+            echo "::error::tauri.conf.json says $app, the tag says $VERSION. Bump the version before tagging."
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: octopus/package-lock.json
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin,x86_64-apple-darwin
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: octopus/src-tauri -> target
+
+      - name: Install dependencies
+        working-directory: octopus
+        run: npm ci
+
+      # Tauri signs and notarizes when these are in the environment; ad hoc ("-") otherwise.
+      - name: Set up signing
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -n "$APPLE_CERTIFICATE" ]; then
+            {
+              echo "APPLE_CERTIFICATE=$APPLE_CERTIFICATE"
+              echo "APPLE_CERTIFICATE_PASSWORD=$APPLE_CERTIFICATE_PASSWORD"
+              echo "APPLE_SIGNING_IDENTITY=$APPLE_SIGNING_IDENTITY"
+            } >> "$GITHUB_ENV"
+            if [ -n "$APPLE_ID" ]; then
+              {
+                echo "APPLE_ID=$APPLE_ID"
+                echo "APPLE_PASSWORD=$APPLE_PASSWORD"
+                echo "APPLE_TEAM_ID=$APPLE_TEAM_ID"
+              } >> "$GITHUB_ENV"
+              echo "SIGNED=notarized" >> "$GITHUB_ENV"
+            else
+              echo "SIGNED=signed" >> "$GITHUB_ENV"
+            fi
+          else
+            echo "APPLE_SIGNING_IDENTITY=-" >> "$GITHUB_ENV"
+            echo "SIGNED=adhoc" >> "$GITHUB_ENV"
+            echo "::warning::No Apple certificate: the app is signed ad hoc and Gatekeeper will ask users to allow it."
+          fi
+
+      - name: Build the universal app
+        working-directory: octopus
+        run: npm run tauri build -- --target universal-apple-darwin --bundles app,dmg
+
+      - name: Collect the files
+        run: |
+          bundle=octopus/src-tauri/target/universal-apple-darwin/release/bundle
+          mkdir -p out
+          dmg=$(ls "$bundle"/dmg/*.dmg | head -1)
+          cp "$dmg" out/
+          # A fixed name too, so releases/latest/download/Octopus.dmg always points at the newest one.
+          cp "$dmg" out/Octopus.dmg
+          ditto -c -k --keepParent "$bundle/macos/Octopus.app" "out/Octopus_${VERSION}_universal.app.zip"
+          (cd out && shasum -a 256 * > SHA256SUMS.txt)
+          ls -la out
+
+      - name: Write the release notes
+        working-directory: octopus
+        run: |
+          previous=$(git describe --tags --abbrev=0 --match 'v*' "$TAG^" 2>/dev/null || true)
+          {
+            if [ -n "$previous" ]; then
+              echo "## Changes since $previous"
+              echo
+              git log --no-merges --pretty='- %s' "$previous..$TAG"
+            else
+              echo "## First release"
+              echo
+              git log --no-merges --pretty='- %s' -n 30 "$TAG"
+            fi
+            echo
+            case "$SIGNED" in
+              notarized) echo "Signed and notarized by Apple." ;;
+              signed) echo "Signed with a Developer ID, not notarized: macOS may ask you to confirm the first time." ;;
+              *) echo "Not notarized by Apple yet: the first time, open **System Settings › Privacy & Security** and choose **Open Anyway**, or run \`xattr -dr com.apple.quarantine /Applications/Octopus.app\`." ;;
+            esac
+          } > ../notes.md
+          cat ../notes.md
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          prerelease=""
+          [[ "$VERSION" == *-* ]] && prerelease="--prerelease"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$TAG" out/* --repo "$GITHUB_REPOSITORY" --clobber
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes-file notes.md
+          else
+            gh release create "$TAG" out/* --repo "$GITHUB_REPOSITORY" \
+              --title "Octopus $VERSION" --notes-file notes.md $prerelease
+          fi

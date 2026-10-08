@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Octopus for Mac</title>
+  <meta name="description" content="Octopus is a Mac app that keeps each software project's tasks, documentation and Claude Code sessions in one window." />
+  <meta name="color-scheme" content="dark light" />
+  <meta property="og:title" content="Octopus for Mac" />
+  <meta property="og:description" content="Tasks, documentation and Claude Code sessions for every project, in one window." />
+  <meta property="og:image" content="assets/icon.png" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="apple-touch-icon" href="assets/icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="site-config.js"></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="top">
+    <div class="wrap top-row">
+      <a class="brand" href="#" aria-label="Octopus home">
+        <img src="assets/icon.png" alt="" width="32" height="32" />
+        <span>Octopus</span>
+      </a>
+      <nav aria-label="Sections">
+        <a href="#workflow">How it works</a>
+        <a href="#features">Features</a>
+        <a href="#extensions">Extensions</a>
+        <a class="nav-download" href="#download">Download</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero ---------------------------------------------------------------->
+    <section class="hero">
+      <div class="wrap hero-copy">
+        <h1>Every project, its tasks and its Claude&nbsp;Code sessions, in one window.</h1>
+        <p class="lede">
+          Octopus is a Mac app for people who build software with Claude Code. Each project gets a task
+          board, its documentation and as many terminals as you need, and you can see which sessions are
+          working, which are idle and which are waiting for you.
+        </p>
+        <div class="cta-row">
+          <a class="button primary" href="#download" data-download-link>
+            <svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path fill="currentColor" d="M11.2 8.4c0-1.6 1.3-2.4 1.4-2.5-.8-1.1-2-1.3-2.4-1.3-1-.1-2 .6-2.5.6s-1.3-.6-2.2-.6C4.4 4.6 3.3 5.3 2.7 6.4c-1.2 2.1-.3 5.2.9 6.9.6.8 1.2 1.7 2.1 1.7.8 0 1.2-.5 2.2-.5s1.3.5 2.2.5c.9 0 1.5-.8 2-1.7.7-1 .9-1.9.9-2-.1 0-1.8-.7-1.8-2.9ZM9.6 3.6c.5-.6.8-1.3.7-2.1-.7 0-1.5.5-2 1.1-.4.5-.8 1.3-.7 2.1.8 0 1.5-.4 2-1.1Z"/></svg>
+            <span data-download-label>Download for Mac</span>
+          </a>
+          <p class="cta-note" data-download-note>For Apple Silicon and Intel Macs. Needs Claude Code.</p>
+        </div>
+      </div>
+
+      <!-- A reconstruction of Octopus's workbench. The animation (app.js) moves one task through the board
+           while its Claude session works on it. -->
+      <div class="wrap">
+        <figure class="app" aria-label="The Octopus window: a project's task board beside a Claude Code session working on one of its tasks.">
+          <div class="app-title">
+            <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="command">
+              <svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true"><path fill="currentColor" d="M6.5 1a5.5 5.5 0 0 1 4.4 8.8l3.8 3.7-1 1-3.7-3.8A5.5 5.5 0 1 1 6.5 1Zm0 1.4a4.1 4.1 0 1 0 0 8.2 4.1 4.1 0 0 0 0-8.2Z"/></svg>
+              Search everything <kbd>⌘⇧F</kbd>
+            </span>
+          </div>
+          <div class="app-body">
+            <div class="activity" aria-hidden="true">
+              <span class="on" title="Projects"><svg viewBox="0 0 16 16"><path d="M1.5 3h5l1.5 1.5h6.5v8.5h-13z"/></svg></span>
+              <span title="Tasks"><svg viewBox="0 0 16 16"><path d="M2 4h2M6 4h8M2 8h2M6 8h8M2 12h2M6 12h8"/></svg></span>
+              <span title="Sessions"><svg viewBox="0 0 16 16"><path d="M2 3h12v10H2zM4.5 6.5 6.5 8l-2 1.5M8 10h3"/></svg></span>
+              <span title="My Notebook"><svg viewBox="0 0 16 16"><path d="M3.5 2h8l1 1v11h-9zM6 5h4M6 8h4"/></svg></span>
+              <span class="ext" title="Extensions"><svg viewBox="0 0 16 16"><path d="M2 2h5v5H2zM9 9h5v5H9zM2 9h5v5H2zM11.5 1.5v6M8.5 4.5h6"/></svg></span>
+            </div>
+            <div class="side" aria-hidden="true">
+              <p class="side-head">Projects</p>
+              <ul>
+                <li class="on"><b style="--c:#a083ff"></b>checkout<span>3</span></li>
+                <li><b style="--c:#4fb6a5"></b>mobile-app<span>1</span></li>
+                <li><b style="--c:#e0a35b"></b>billing-api</li>
+                <li><b style="--c:#6aa7f0"></b>design-system</li>
+              </ul>
+              <p class="side-head">Sessions</p>
+              <ul class="sessions">
+                <li><i class="dot" data-session-dot></i>Fix the login redirect</li>
+                <li><i class="dot idle"></i>Refactor cart totals</li>
+                <li><i class="dot waiting"></i>Add Apple Pay</li>
+              </ul>
+            </div>
+            <div class="editor">
+              <div class="tabs" aria-hidden="true">
+                <span class="on">Tasks</span><span>Terminals</span><span>Documentation</span><span>Git <em>4</em></span><span>Notebooks</span>
+              </div>
+              <div class="workspace">
+                <div class="board" data-board>
+                  <div class="col" data-col="todo">
+                    <p class="col-head">To do <span data-count>2</span></p>
+                    <div class="card" data-task>
+                      <p>Fix the login redirect</p>
+                      <div class="card-meta"><span class="prio high">High</span><span class="tag">#auth</span></div>
+                      <button class="start" type="button" tabindex="-1" data-start>Start Claude</button>
+                    </div>
+                    <div class="card">
+                      <p>Show saved cards first</p>
+                      <div class="card-meta"><span class="prio">Medium</span></div>
+                    </div>
+                  </div>
+                  <div class="col" data-col="doing">
+                    <p class="col-head">In progress <span data-count>1</span></p>
+                    <div class="card">
+                      <p>Refactor cart totals</p>
+                      <div class="card-meta"><span class="prio">Medium</span><span class="tag">#cart</span></div>
+                    </div>
+                  </div>
+                  <div class="col" data-col="review">
+                    <p class="col-head">Review <span data-count>0</span></p>
+                  </div>
+                  <div class="col col-done" data-col="done">
+                    <p class="col-head">Done <span data-count>1</span></p>
+                    <div class="card">
+                      <p>Validate postcodes</p>
+                      <div class="card-meta"><span class="prio low">Low</span></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="term" aria-hidden="true">
+                  <div class="term-head"><i class="dot" data-session-dot></i><span data-term-title>Claude: Fix the login redirect</span></div>
+                  <pre class="term-body" data-term></pre>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="app-status" aria-hidden="true">
+            <span>checkout</span><span>⎇ main</span><span class="grow"></span><span data-status>1 working, 1 waiting</span>
+          </div>
+        </figure>
+      </div>
+    </section>
+
+    <!-- The loop, which is a real sequence -------------------------------->
+    <section class="section" id="workflow">
+      <div class="wrap">
+        <h2>From a task to a reviewed change</h2>
+        <p class="section-lede">Octopus is built around one loop: write down what needs doing, hand it to Claude, look at what came back.</p>
+        <ol class="steps">
+          <li>
+            <h3>Write the task</h3>
+            <p>Quick add takes priority, tags and project in one line: <code>Fix the login redirect !high #auth @checkout</code>. Link the documents and pages Claude should read with <code>@</code>.</p>
+          </li>
+          <li>
+            <h3>Start Claude</h3>
+            <p>Octopus opens a Claude Code session in the project's folder with the task, its description and everything it links to as the first request. The task moves to In progress.</p>
+          </li>
+          <li>
+            <h3>Keep an eye on it</h3>
+            <p>Each session has a dot: <i class="dot" aria-hidden="true"></i>&nbsp;working, <i class="dot idle" aria-hidden="true"></i>&nbsp;idle, <i class="dot waiting" aria-hidden="true"></i>&nbsp;waiting for you. Work on something else and come back when it rings.</p>
+          </li>
+          <li>
+            <h3>Review and close</h3>
+            <p>When Claude finishes, the task moves to Review. Read the diff file by file in the Git tab, commit, and mark it done.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Features ---------------------------------------------------------->
+    <section class="section" id="features">
+      <div class="wrap">
+        <h2>What's in the window</h2>
+
+        <div class="feature feature-split">
+          <div>
+            <h3>Tasks live in the repository</h3>
+            <p>
+              Each task is a Markdown file in the project's <code>.octopus/tasks</code> folder, so the
+              whole team shares the board through git. One file per task means no merge conflicts and
+              pull requests you can read. Claude can add tasks or close them by editing a file, and the
+              board updates as files change.
+            </p>
+            <p class="small">Prefer to keep them private? Move a project's tasks to this Mac only.</p>
+          </div>
+          <pre class="code" aria-label="Example task file"><span class="c">.octopus/tasks/fix-login-redirect-7f3a2c.md</span>
+<span class="k">---</span>
+<span class="k">title:</span> Fix the login redirect
+<span class="k">status:</span> doing      <span class="c"># todo | doing | review | done</span>
+<span class="k">priority:</span> high
+<span class="k">run:</span> npm test -- auth
+<span class="k">---</span>
+After sign-in, users land on / instead of
+the page they came from. See
+[Auth design](octopus://doc/docs/auth.md).</pre>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature">
+            <h3>Terminals that know what they're doing</h3>
+            <p>Claude sessions and shells run in the project's folder, side by side or in a window of their own. Octopus remembers them and resumes the conversation after a restart.</p>
+          </article>
+          <article class="feature">
+            <h3>Sessions from other apps too</h3>
+            <p>Claude Code running in Terminal, iTerm2, VS Code, Cursor, Warp or Ghostty shows up under its project, with the conversation's title and whether it's working.</p>
+          </article>
+          <article class="feature">
+            <h3>Documentation next to the work</h3>
+            <p>Read and edit a project's Markdown docs in a tab. With Mido installed you get its full editor: Mermaid, KaTeX, comments, search.</p>
+          </article>
+          <article class="feature">
+            <h3>Notebooks and databases</h3>
+            <p>Pages for specs and notes, with to-dos that are real tasks. Databases with table, board, list and calendar views, relations, rollups and formulas.</p>
+          </article>
+          <article class="feature">
+            <h3>Git and review</h3>
+            <p>Changes, staging, commits, branches and a graph. The review tab shows every changed file on one page and remembers which ones you've already read.</p>
+          </article>
+          <article class="feature">
+            <h3>Links between everything</h3>
+            <p>Tasks, pages and documents link to each other with plain Markdown links that read fine on GitHub. Every item lists what links to it.</p>
+          </article>
+          <article class="feature">
+            <h3>Run a task's check</h3>
+            <p>Give a task a command, like <code>npm test</code>. Run it from the card: success moves the task to Review, a failure tells you the exit code.</p>
+          </article>
+          <article class="feature">
+            <h3>More than one Claude account</h3>
+            <p>Use your personal account in one project and your work account in another. Octopus starts every session, and resumes it, in the right one.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Extensions -------------------------------------------------------->
+    <section class="section section-ext" id="extensions">
+      <div class="wrap">
+        <h2>Build the section you're missing</h2>
+        <p class="section-lede">
+          An extension adds a section of its own to Octopus: a dashboard for your logs, a client for an
+          internal API, a release checklist. You don't need to know the SDK. Describe what you want and
+          Claude writes it inside Octopus, while you watch it reload with every change.
+        </p>
+
+        <div class="ext-grid">
+          <ol class="steps steps-tight">
+            <li>
+              <h3>Describe it</h3>
+              <p><em>New extension</em> asks what it should do and opens a Claude Code session in its folder, next to the live page.</p>
+            </li>
+            <li>
+              <h3>Allow what it asks for</h3>
+              <p>An extension only reaches what its manifest declares: specific hosts, Claude, tasks, documentation. You approve it before it runs, and again if it asks for more.</p>
+            </li>
+            <li>
+              <h3>Share it</h3>
+              <p><em>Publish</em> pushes it to a marketplace, any git repository, as a branch ready for a pull request. Teammates install it and get updates from there.</p>
+            </li>
+          </ol>
+
+          <div class="ext-files">
+            <pre class="code" aria-label="An extension's manifest"><span class="c">~/.octopus/extensions/log-explorer/manifest.json</span>
+{
+  <span class="k">"name"</span>: "Log explorer",
+  <span class="k">"description"</span>: "Search checkout logs, file tasks",
+  <span class="k">"icon"</span>: "pulse",
+  <span class="k">"version"</span>: "1.2.0",
+  <span class="k">"permissions"</span>: {
+    <span class="k">"http"</span>: ["https://logs.internal/api/"],
+    <span class="k">"claude"</span>: true,
+    <span class="k">"tasks"</span>: true
+  }
+}</pre>
+            <pre class="code" aria-label="Using the extension SDK"><span class="c">// index.html + plain files, no build step</span>
+<span class="k">await</span> octopus.ready();
+<span class="k">const</span> res = <span class="k">await</span> octopus.http.fetch(url);
+<span class="k">const</span> why = <span class="k">await</span> octopus.claude.ask(
+  "Group these errors by cause: " + res.text());
+<span class="k">await</span> octopus.tasks.create({ title, body: why });</pre>
+          </div>
+        </div>
+
+        <p class="ext-foot">
+          Extensions are plain HTML, CSS and JavaScript in a sandbox with its own origin. They use
+          Octopus's theme automatically and talk to the app only through its SDK: HTTP to the hosts
+          you allowed, Claude (read-only), tasks, projects, documentation, storage.
+        </p>
+      </div>
+    </section>
+
+    <!-- Download ---------------------------------------------------------->
+    <section class="section" id="download">
+      <div class="wrap download">
+        <div>
+          <h2>Download Octopus</h2>
+          <p class="section-lede" data-release-summary>Looking up the latest version…</p>
+          <a class="button primary big" href="#" data-download-link hidden>
+            <span data-download-label>Download for Mac</span>
+          </a>
+          <p class="small" data-download-alt></p>
+        </div>
+        <div class="requirements">
+          <h3>You'll need</h3>
+          <ul>
+            <li>A Mac with Apple Silicon or Intel</li>
+            <li><a href="https://docs.claude.com/en/docs/claude-code/overview" rel="noopener">Claude Code</a> installed, with <code>claude</code> on your shell's PATH</li>
+            <li>Optional: Mido, for the full documentation editor</li>
+          </ul>
+          <details class="gatekeeper" data-gatekeeper>
+            <summary>macOS says the app can't be opened</summary>
+            <p>Builds that aren't notarized by Apple yet are stopped by Gatekeeper the first time. Open <b>System Settings › Privacy &amp; Security</b> and choose <b>Open Anyway</b> next to Octopus, or run:</p>
+            <pre class="code"><code>xattr -dr com.apple.quarantine /Applications/Octopus.app</code></pre>
+          </details>
+        </div>
+      </div>
+      <div class="wrap">
+        <h3 class="releases-head">Previous versions</h3>
+        <ul class="releases" data-releases><li class="small">None yet.</li></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-row">
+      <span class="brand small-brand"><img src="assets/icon.png" alt="" width="20" height="20" /> Octopus</span>
+      <span class="small">A Mac app for working with Claude Code. Not affiliated with Anthropic.</span>
+      <a class="small" data-repo-link href="#">Releases on GitHub</a>
+    </div>
+  </footer>
+</body>
+</html>
