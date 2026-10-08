@@ -1,163 +1,23 @@
-// Octopus site: the hero's animation and the download links, read from this repository's GitHub Releases.
+// Octopus site: screenshots that open larger, and the download links, read from this repository's GitHub Releases.
 (() => {
   const config = window.OCTOPUS_SITE ?? { repo: "serafo27/octopus-site" };
   const $ = (sel, root = document) => root.querySelector(sel);
   const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   // ---------------------------------------------------------------------------------------------
-  // Hero: one task goes from To do to Review while its Claude session works on it.
+  // Screenshots open larger on click.
 
-  const board = $("[data-board]");
-  const task = $("[data-task]");
-  const startButton = $("[data-start]");
-  const term = $("[data-term]");
-  const dots = $$("[data-session-dot]");
-  const status = $("[data-status]");
-
-  const TRANSCRIPT = [
-    ["u", "> Fix the login redirect"],
-    ["t", "  After sign-in, users land on / instead of the page they came from."],
-    ["t", "  Read docs/auth.md. When you're done, run: npm test -- auth"],
-    ["", ""],
-    ["", "⏺ Read docs/auth.md, src/auth/redirect.ts"],
-    ["", "⏺ Update src/auth/redirect.ts"],
-    ["ok", "    + const next = safeNext(params.get(\"next\"))"],
-    ["ok", "    + return redirect(next ?? \"/\")"],
-    ["", "⏺ Bash npm test -- auth"],
-    ["ok", "    ✓ 14 passed"],
-    ["", ""],
-    ["", "The redirect now keeps the page you came from."],
-    ["", "Task moved to Review."],
-  ];
-
-  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-  let running = false;
-  let visible = true;
-  let generation = 0;
-
-  function setDots(state) {
-    for (const d of dots) {
-      d.className = "dot";
-      if (state === "off") d.classList.add("off");
-      if (state === "working") d.classList.add("pulse");
-      if (state === "idle") d.classList.add("idle");
-    }
-  }
-
-  function updateCounts() {
-    for (const col of $$("[data-col]", board)) {
-      $("[data-count]", col).textContent = $$(".card", col).length;
-    }
-  }
-
-  // Move the card to another column, sliding it from where it was (FLIP).
-  function moveTask(colName, animate = true) {
-    const target = $(`[data-col="${colName}"]`, board);
-    const before = task.getBoundingClientRect();
-    const head = $(".col-head", target);
-    head.after(task);
-    updateCounts();
-    if (!animate || reduced) return;
-    const after = task.getBoundingClientRect();
-    const dx = before.left - after.left;
-    const dy = before.top - after.top;
-    task.animate(
-      [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "translate(0, 0)" }],
-      { duration: 650, easing: "cubic-bezier(.2,.8,.2,1)" },
-    );
-  }
-
-  function renderTranscript(lines, caret) {
-    term.innerHTML = "";
-    for (const [cls, text] of lines) {
-      const line = document.createElement("span");
-      if (cls) line.className = cls;
-      line.textContent = text + "\n";
-      term.append(line);
-    }
-    if (caret) {
-      const c = document.createElement("span");
-      c.className = "caret";
-      term.append(c);
-    }
-  }
-
-  function reset() {
-    moveTask("todo", false);
-    task.classList.remove("lit");
-    startButton.classList.remove("pressed");
-    startButton.hidden = false;
-    setDots("off");
-    renderTranscript([["t", "Start Claude on a task to open a session here."]], false);
-    if (status) status.textContent = "1 working, 1 waiting";
-  }
-
-  function finalState() {
-    moveTask("review", false);
-    startButton.hidden = true;
-    setDots("idle");
-    renderTranscript(TRANSCRIPT, false);
-    if (status) status.textContent = "1 waiting, 1 for review";
-  }
-
-  async function waitVisible(gen) {
-    while (!visible && gen === generation) await sleep(300);
-    return gen === generation;
-  }
-
-  async function play() {
-    if (running) return;
-    running = true;
-    const gen = ++generation;
-    try {
-      for (;;) {
-        reset();
-        await sleep(1600);
-        if (!(await waitVisible(gen))) return;
-
-        task.classList.add("lit");
-        startButton.classList.add("pressed");
-        await sleep(450);
-        startButton.hidden = true;
-        moveTask("doing");
-        setDots("working");
-        if (status) status.textContent = "2 working, 1 waiting";
-
-        const shown = [];
-        for (const line of TRANSCRIPT) {
-          if (!(await waitVisible(gen))) return;
-          shown.push(line);
-          renderTranscript(shown, true);
-          await sleep(line[1] ? 420 : 160);
-        }
-        await sleep(500);
-        task.classList.remove("lit");
-        moveTask("review");
-        setDots("idle");
-        renderTranscript(TRANSCRIPT, false);
-        if (status) status.textContent = "1 working, 1 waiting, 1 for review";
-        await sleep(5200);
-      }
-    } finally {
-      running = false;
-    }
-  }
-
-  if (board && task && term) {
-    if (reduced) {
-      finalState();
-    } else {
-      reset();
-      const figure = board.closest("figure");
-      new IntersectionObserver((entries) => {
-        visible = entries.some((e) => e.isIntersecting) && !document.hidden;
-        if (visible) play();
-      }, { threshold: 0.25 }).observe(figure);
-      document.addEventListener("visibilitychange", () => {
-        if (document.hidden) visible = false;
+  const lightbox = $("[data-lightbox]");
+  if (lightbox && typeof lightbox.showModal === "function") {
+    const big = $("img", lightbox);
+    for (const shot of $$(".shot img")) {
+      shot.addEventListener("click", () => {
+        big.src = shot.currentSrc || shot.src;
+        big.alt = shot.alt;
+        lightbox.showModal();
       });
     }
+    lightbox.addEventListener("click", () => lightbox.close());
   }
 
   // ---------------------------------------------------------------------------------------------
@@ -208,7 +68,7 @@
     }
     for (const label of $$("[data-download-label]")) label.textContent = `Download Octopus ${version}`;
     const note = $("[data-download-note]");
-    if (note) note.textContent = `Released ${date}. For Apple Silicon and Intel Macs. Needs Claude Code.`;
+    if (note) note.textContent = `Version ${version}, ${date}. For Apple Silicon and Intel Macs.`;
 
     $("[data-release-summary]").textContent =
       `Version ${version}, released ${date}. One download runs natively on Apple Silicon and Intel Macs.`;
@@ -222,10 +82,8 @@
     const list = $("[data-releases]");
     list.innerHTML = "";
     const older = usable.slice(1, 8);
-    if (!older.length) {
-      list.append(Object.assign(document.createElement("li"), { className: "small", textContent: "This is the first version." }));
-      return;
-    }
+    if (!older.length) return;
+    $("[data-releases-wrap]").hidden = false;
     for (const r of older) {
       const li = document.createElement("li");
       const file = pickDmg(r.assets);

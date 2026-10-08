@@ -1,3 +1,6 @@
 .DS_Store
 out/
 notes.md
+screens/node_modules
+screens/out/
+screens/.vite/
