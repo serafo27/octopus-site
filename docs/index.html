@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Octopus: your work hub for Claude Code</title>
-  <meta name="description" content="Octopus is the work hub for building software with Claude Code: tasks, sessions, docs and git for every project in one Mac app, kept up to date for you." />
+  <title>Octopus: every project in order</title>
+  <meta name="description" content="Octopus is the Mac work hub that keeps your software projects organized: tasks, terminals, AI sessions, docs and git for every project, in one place and always up to date." />
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#100f17" />
-  <meta property="og:title" content="Octopus: your work hub for Claude Code" />
-  <meta property="og:description" content="Tasks, Claude Code sessions, docs and git for every project, in one Mac app that keeps itself up to date." />
+  <meta property="og:title" content="Octopus: every project in order" />
+  <meta property="og:description" content="Tasks, terminals, AI sessions, docs and git for every project, organized in one Mac app that keeps itself up to date." />
   <meta property="og:image" content="assets/screens/task.webp" />
   <link rel="icon" type="image/png" href="assets/favicon.png" />
   <link rel="apple-touch-icon" href="assets/icon.png" />
@@ -41,8 +41,8 @@
     <section class="hero">
       <div class="wrap hero-copy">
         <img class="hero-icon" src="assets/icon.png" alt="" width="88" height="88" />
-        <h1>The work hub for building with Claude&nbsp;Code.</h1>
-        <p class="lede">Every project's tasks, Claude sessions, docs and git in one Mac app. Hand a task to Claude and Octopus handles the rest: the context, the tracking, the status updates.</p>
+        <h1>Every project in order. Everything under&nbsp;control.</h1>
+        <p class="lede">Octopus is the work hub for your software projects. Tasks, terminals, AI sessions, docs and git live in one place, and Octopus keeps them up to date, so you always know where everything stands.</p>
         <div class="cta">
           <a class="button primary" href="#download" data-download-link>
             <svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path fill="currentColor" d="M11.2 8.4c0-1.6 1.3-2.4 1.4-2.5-.8-1.1-2-1.3-2.4-1.3-1-.1-2 .6-2.5.6s-1.3-.6-2.2-.6C4.4 4.6 3.3 5.3 2.7 6.4c-1.2 2.1-.3 5.2.9 6.9.6.8 1.2 1.7 2.1 1.7.8 0 1.2-.5 2.2-.5s1.3.5 2.2.5c.9 0 1.5-.8 2-1.7.7-1 .9-1.9.9-2-.1 0-1.8-.7-1.8-2.9ZM9.6 3.6c.5-.6.8-1.3.7-2.1-.7 0-1.5.5-2 1.1-.4.5-.8 1.3-.7 2.1.8 0 1.5-.4 2-1.1Z"/></svg>
@@ -54,7 +54,7 @@
       </div>
       <div class="wrap wrap-wide">
         <figure class="shot shot-hero">
-          <img src="assets/screens/terminals.webp" width="2400" height="1500" alt="Octopus with the checkout project open: three Claude Code sessions and a shell listed with their state, and one session fixing the login redirect." fetchpriority="high" />
+          <img src="assets/screens/terminals.webp" width="2400" height="1500" alt="Octopus with the checkout project open: its sessions listed with their state, and one of them working on the login redirect task." fetchpriority="high" />
         </figure>
       </div>
     </section>
@@ -62,7 +62,7 @@
     <!-- Feature index -->
     <nav class="index wrap" id="features" aria-label="Features">
       <a href="#tasks"><span class="dot" style="--c:#a083ff"></span>Tasks</a>
-      <a href="#claude"><span class="dot" style="--c:#5aa9ff"></span>Claude on a task</a>
+      <a href="#delegate"><span class="dot" style="--c:#5aa9ff"></span>Delegation</a>
       <a href="#sessions"><span class="dot" style="--c:#4ec98a"></span>Sessions</a>
       <a href="#docs"><span class="dot" style="--c:#e6c14f"></span>Documentation</a>
       <a href="#git"><span class="dot" style="--c:#f29a80"></span>Git and review</a>
@@ -76,8 +76,8 @@
       <div class="wrap feature-row">
         <div class="feature-copy">
           <p class="kicker">Tasks</p>
-          <h2>All your tasks in one place, shared with your team.</h2>
-          <p>Each project has its own board, saved in its repository as plain Markdown. It syncs through git with no extra service, and when Claude or a teammate changes a task, the board updates by itself.</p>
+          <h2>Every task in its place.</h2>
+          <p>Each project gets its own board, saved in its repository as plain Markdown. It stays in sync with your team through git, and updates by itself whenever a task changes, wherever it changed.</p>
           <ul class="points">
             <li>Add a task in one line: <code>Fix the redirect !high #auth</code></li>
             <li>One file per task, so no merge conflicts</li>
@@ -88,19 +88,19 @@
       </div>
     </section>
 
-    <section class="feature flip" id="claude">
+    <section class="feature flip" id="delegate">
       <div class="wrap feature-row">
         <div class="feature-copy">
-          <p class="kicker">Claude on a task</p>
-          <h2>Hand off a task. Octopus does the busywork.</h2>
-          <p>One click starts Claude Code in the right folder, already briefed with the task, its checklist and every doc and page it links to. The task moves to In progress, then to Review when Claude is done. No copying, pasting or updating by hand.</p>
+          <p class="kicker">Delegation</p>
+          <h2>Delegate a task without losing track of it.</h2>
+          <p>Hand a task to your AI assistant in one click. Octopus briefs it with the task, its checklist and every doc it links to, then moves the task to In progress and on to Review when the work is done. The board always shows where things really stand.</p>
           <ul class="points">
-            <li>Linked docs, pages and tasks go into Claude's brief</li>
+            <li>Linked docs, pages and tasks go into the brief</li>
             <li>A check command, like <code>npm test</code>, that moves the task when it passes</li>
             <li>Every session and run, recorded on the task</li>
           </ul>
         </div>
-        <figure class="shot"><img src="assets/screens/task.webp" width="2400" height="1500" loading="lazy" alt="A task's details beside the board: status, priority, run command, a description with a checklist, the page that links to it and its working Claude session." /></figure>
+        <figure class="shot"><img src="assets/screens/task.webp" width="2400" height="1500" loading="lazy" alt="A task's details beside the board: status, priority, check command, a description with a checklist, the page that links to it and the session working on it." /></figure>
       </div>
     </section>
 
@@ -108,14 +108,14 @@
       <div class="wrap feature-row">
         <div class="feature-copy">
           <p class="kicker">Sessions</p>
-          <h2>Every session in one view. Octopus tells you which one needs you.</h2>
-          <p>All your Claude Code sessions and shells, across projects, each showing its state. Run several at once and work on something else until one needs you.</p>
+          <h2>Every terminal accounted for.</h2>
+          <p>All your sessions and shells, across every project, in one view. Each shows its state, so you always know what's running, what's finished and what's waiting for you.</p>
           <ul class="points states">
             <li><span class="dot" style="--c:var(--working)"></span>Working</li>
             <li><span class="dot" style="--c:var(--waiting)"></span>Waiting for you</li>
             <li><span class="dot" style="--c:var(--idle)"></span>Idle</li>
           </ul>
-          <p class="small">Sessions you started in Terminal, iTerm2, VS Code, Cursor, Warp or Ghostty show up too, filed under the right project.</p>
+          <p class="small">Terminals open in Terminal, iTerm2, VS Code, Cursor, Warp or Ghostty show up too, filed under the right project.</p>
         </div>
         <figure class="shot"><img src="assets/screens/sessions.webp" width="2400" height="1500" loading="lazy" alt="The Sessions view: four terminals in a grid, one working, one waiting for an answer, one idle, and a dev server." /></figure>
       </div>
@@ -125,8 +125,8 @@
       <div class="wrap feature-row">
         <div class="feature-copy">
           <p class="kicker">Documentation</p>
-          <h2>Docs right next to the work they describe.</h2>
-          <p>The Markdown in your repository, one tab away from the tasks and terminals. Link a doc to a task and Claude reads it before it starts; ask, and Claude updates it when the code changes. With Mido installed you get its full editor, with diagrams, math and comments.</p>
+          <h2>Docs that stay next to the work.</h2>
+          <p>The Markdown in your repository, one tab away from tasks and terminals. Link a doc to a task and it's always at hand, for you and for the AI working on it. With Mido installed you get its full editor, with diagrams, math and comments.</p>
           <ul class="points">
             <li>Read, edit or both side by side</li>
             <li>Rename a document and every link to it follows</li>
@@ -140,8 +140,8 @@
       <div class="wrap feature-row">
         <div class="feature-copy">
           <p class="kicker">Git and review</p>
-          <h2>Review and ship without leaving the hub.</h2>
-          <p>See exactly what Claude changed, side by side, then stage, commit and push from the same window. The review page shows every changed file at once and remembers which ones you've read.</p>
+          <h2>See every change before it ships.</h2>
+          <p>Every changed file, side by side, then stage, commit and push from the same window. The review page remembers which files you've already read, so nothing slips through.</p>
           <ul class="points">
             <li>Commit, push, pull, merge and resolve conflicts</li>
             <li>Branches and history at a glance</li>
@@ -156,7 +156,7 @@
         <div class="feature-copy">
           <p class="kicker">Notebooks</p>
           <h2>Specs, notes and plans, connected to the work.</h2>
-          <p>Write the spec where the tasks are. A to-do on a page is a real task on the board, kept in sync both ways, and databases track everything else with table, board, list and calendar views.</p>
+          <p>Write the spec where the tasks are. A to-do on a page is a real task on the board, kept in sync both ways, and databases organize everything else with table, board, list and calendar views.</p>
           <ul class="points">
             <li>Slash commands, code blocks, callouts and links</li>
             <li>Relations, rollups and formulas in databases</li>
@@ -174,7 +174,7 @@
         <div class="feature-copy">
           <p class="kicker">Priorities</p>
           <h2>One list of what's next, across every project.</h2>
-          <p>Every open task from every project, sorted by priority, with your running sessions on top. Start your day here and pick what to hand off next. Tasks that belong to no project live here too.</p>
+          <p>Every open task from every project, sorted by priority, with what's running on top. Start your day here and decide what comes next. Tasks that belong to no project have a place here too.</p>
         </div>
         <figure class="shot"><img src="assets/screens/priorities.webp" width="2400" height="1500" loading="lazy" alt="All Tasks in the Priorities view: open sessions on top, then tasks from four projects grouped as urgent, high and medium." /></figure>
       </div>
@@ -183,11 +183,11 @@
     <!-- The rest, briefly -->
     <section class="more">
       <div class="wrap">
-        <h2 class="more-title">Small automations that add up.</h2>
+        <h2 class="more-title">Small things that keep it all in order.</h2>
         <dl class="more-grid">
           <div><dt>Search everything</dt><dd>Find any project, task, page, document or session from one box: <kbd>⌘</kbd><kbd>⇧</kbd><kbd>F</kbd>.</dd></div>
-          <div><dt>More than one Claude account</dt><dd>Personal in one project, work in another. Every session starts and resumes in the right account by itself.</dd></div>
-          <div><dt>Pick up where you left off</dt><dd>Your sessions come back after a restart, and Claude resumes the conversation it was in.</dd></div>
+          <div><dt>Work and personal, kept apart</dt><dd>Use a different AI account per project. Every session starts and resumes in the right one by itself.</dd></div>
+          <div><dt>Pick up where you left off</dt><dd>Your sessions come back after a restart, conversations included.</dd></div>
           <div><dt>Terminals in their own window</dt><dd>Pop a session out to its own window. Close the window and it goes back where it was.</dd></div>
           <div><dt>Links between everything</dt><dd>Tasks, pages and docs link to each other with plain Markdown, and each one lists what links back to it.</dd></div>
           <div><dt>Themes</dt><dd>Dark and Light Modern, GitHub, Dracula, Nord and Solarized, or follow macOS.</dd></div>
@@ -201,27 +201,23 @@
         <div class="ext-head">
           <p class="kicker">Extensions</p>
           <h2>Bring the rest of your tools into the hub.</h2>
-          <p>Need your logs, an internal API or a standup summary next to your tasks? Describe it, and Claude builds it as a new section of Octopus while you watch it take shape.</p>
+          <p>Need your logs, an internal API or a standup summary next to your tasks? Describe it, and the AI builds it as a new section of Octopus while you watch it take shape.</p>
         </div>
         <figure class="shot"><img src="assets/screens/extensions.webp" width="2400" height="1500" loading="lazy" alt="The Extensions section: a team marketplace with six extensions, and the details of Feature flags with what it can reach." /></figure>
         <ol class="ext-steps">
           <li>
-            <h3>Create with Claude</h3>
-            <p>Say what you need. Claude writes it next to a live preview, and you refine it by asking.</p>
+            <h3>Describe it</h3>
+            <p>Say what you need. The AI writes it next to a live preview, and you refine it by asking.</p>
           </li>
           <li>
             <h3>Approve what it can reach</h3>
-            <p>An extension only gets the sites, Claude access, tasks or docs it asks for, and only after you say yes.</p>
+            <p>An extension only reaches the sites, tasks or docs it asks for, and only after you say yes.</p>
           </li>
           <li>
             <h3>Share with your team</h3>
             <p>Publish it to your team's marketplace, any git repository. Teammates install it in one click and get every update.</p>
           </li>
         </ol>
-        <pre class="code" aria-label="An extension using the Octopus SDK"><span class="c">// index.html of an extension: no build step</span>
-<span class="k">const</span> res = <span class="k">await</span> octopus.http.fetch(<span class="s">"https://logs.internal/api/errors"</span>);
-<span class="k">const</span> summary = <span class="k">await</span> octopus.claude.ask(<span class="s">"Group these errors by cause: "</span> + res.text());
-<span class="k">await</span> octopus.tasks.create({ title: <span class="s">"Fix the top error"</span>, body: summary });</pre>
       </div>
     </section>
 
@@ -229,7 +225,7 @@
     <section class="download" id="download">
       <div class="wrap download-card">
         <img src="assets/icon.png" alt="" width="96" height="96" />
-        <h2>Bring all your work into one place.</h2>
+        <h2>Put your work in order.</h2>
         <p class="lede" data-release-summary>Looking up the latest version…</p>
         <div class="cta">
           <a class="button primary" href="#" data-download-link hidden>
@@ -239,7 +235,7 @@
         <p class="small" data-download-alt></p>
         <ul class="needs">
           <li>macOS on Apple Silicon or Intel</li>
-          <li><a href="https://docs.claude.com/en/docs/claude-code/overview" rel="noopener">Claude Code</a> installed on your Mac</li>
+          <li>An AI coding assistant, to delegate tasks (<a href="https://docs.claude.com/en/docs/claude-code/overview" rel="noopener">Claude Code</a>)</li>
           <li>Optional: Mido, for the full documentation editor</li>
         </ul>
         <details class="gatekeeper">
@@ -258,7 +254,7 @@
   <footer class="foot">
     <div class="wrap foot-row">
       <span class="brand"><img src="assets/icon.png" alt="" width="20" height="20" /> Octopus</span>
-      <span class="small grow">The work hub for building software with Claude Code. Not affiliated with Anthropic.</span>
+      <span class="small grow">The work hub that keeps your software projects in order.</span>
       <a class="small" data-repo-link href="#">Releases on GitHub</a>
     </div>
   </footer>
