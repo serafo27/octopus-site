@@ -1,12 +1,16 @@
 name: Release Octopus
 
-# Builds the Octopus Mac app from a tag of serafo27/octopus and publishes it as a GitHub Release of this
-# repository, where the site's download button finds it.
+# Builds the Octopus Mac app from serafo27/octopus and publishes it as a GitHub Release of this repository,
+# on one of two channels:
+#   - stable: a tag `v*`, released as that version (the site's download button, the stable update channel);
+#   - preview: a push to main, built as `<next version>-preview.<commits since the last tag>` (e.g.
+#     0.2.1-preview.7, between the last release and the next one) and published on the rolling prerelease
+#     `preview`, whose files each preview build replaces (the preview update channel).
 #
 # Started by:
-#   - the octopus repository, when a tag `v*` is pushed (its notify-release workflow sends a
-#     `repository_dispatch` of type `octopus-tag` with `client_payload.tag`);
-#   - by hand: Actions › Release Octopus › Run workflow, with the tag.
+#   - the octopus repository (its notify-release workflow): a `repository_dispatch` of type `octopus-tag`
+#     with `client_payload.tag`, or `octopus-preview` with `client_payload.sha`;
+#   - by hand: Actions › Release Octopus › Run workflow, with the channel and the tag (stable) or ref (preview).
 #
 # Secrets (Settings › Secrets and variables › Actions):
 #   OCTOPUS_REPO_TOKEN          read access to serafo27/octopus (fine-grained token, Contents: read).
@@ -19,64 +23,173 @@ name: Release Octopus
 #   TAURI_SIGNING_PRIVATE_KEY   the updater key (`npm run tauri signer generate`), whose public half is in
 #   TAURI_SIGNING_PRIVATE_KEY_PASSWORD
 #                               Octopus's tauri.conf.json: the app installs only updates signed with it.
-#                               Without it the release has no in-app update (latest.json), only the downloads.
+#                               Without it a stable release has no in-app update (latest.json), only the
+#                               downloads, and there are no preview builds.
 # Without the Apple secrets the app is signed ad hoc: it runs, but Gatekeeper asks the user to allow it.
 #
-# For the in-app updater the release also carries latest.json (the update for tauri-plugin-updater: the
-# signed .app.tar.gz) and releases.json (every release's notes, for the changelog the update popup shows).
+# For the in-app updater each release also carries latest.json (the update for tauri-plugin-updater: the
+# signed .app.tar.gz); stable ones releases.json too (every release's notes, for the update popup's
+# changelog). The preview channel's latest.json is always the newest of the two channels: a stable release
+# replaces it when it's newer than the last preview.
 
 on:
   repository_dispatch:
-    types: [octopus-tag]
+    types: [octopus-tag, octopus-preview]
   workflow_dispatch:
     inputs:
+      channel:
+        description: "Channel"
+        type: choice
+        options: [stable, preview]
+        default: stable
       tag:
-        description: "Tag of serafo27/octopus to build (e.g. v0.2.0)"
-        required: true
+        description: "Stable: the tag of serafo27/octopus to build (e.g. v0.2.0)"
+        required: false
+        type: string
+      ref:
+        description: "Preview: the commit or branch of serafo27/octopus to build (default main)"
+        required: false
         type: string
 
 permissions:
   contents: write
 
 env:
-  TAG: ${{ github.event.client_payload.tag || inputs.tag }}
   SOURCE_REPO: serafo27/octopus
 
+# One stable build per tag, never cancelled; previews one at a time, a newer push cancelling the build before.
 concurrency:
-  group: release-${{ github.event.client_payload.tag || inputs.tag }}
-  cancel-in-progress: false
+  group: ${{ (github.event.action == 'octopus-preview' || inputs.channel == 'preview') && 'release-preview' || format('release-{0}', github.event.client_payload.tag || inputs.tag) }}
+  cancel-in-progress: ${{ github.event.action == 'octopus-preview' || inputs.channel == 'preview' }}
 
 jobs:
-  build:
-    name: Build and publish ${{ github.event.client_payload.tag || inputs.tag }}
-    runs-on: macos-latest
-    timeout-minutes: 60
+  # What to build: the channel, the commit and the version.
+  plan:
+    name: Plan
+    runs-on: ubuntu-latest
+    outputs:
+      channel: ${{ steps.plan.outputs.channel }}
+      ref: ${{ steps.plan.outputs.ref }}
+      tag: ${{ steps.plan.outputs.tag }}
+      version: ${{ steps.plan.outputs.version }}
+      base: ${{ steps.plan.outputs.base }}
+      last: ${{ steps.plan.outputs.last }}
+      skip: ${{ steps.plan.outputs.skip }}
     steps:
-      - name: Check the tag
+      - name: Pick the channel
+        env:
+          ACTION: ${{ github.event.action }}
+          INPUT_CHANNEL: ${{ inputs.channel }}
+          TAG: ${{ github.event.client_payload.tag || inputs.tag }}
+          SHA: ${{ github.event.client_payload.sha || inputs.ref || 'main' }}
         run: |
-          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
-            echo "::error::'$TAG' isn't a version tag like v1.2.3"
-            exit 1
+          if [ "$ACTION" = octopus-preview ] || [ "$INPUT_CHANNEL" = preview ]; then
+            echo "CHANNEL=preview" >> "$GITHUB_ENV"
+            echo "REF=$SHA" >> "$GITHUB_ENV"
+          else
+            if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+              echo "::error::'$TAG' isn't a version tag like v1.2.3"
+              exit 1
+            fi
+            echo "CHANNEL=stable" >> "$GITHUB_ENV"
+            echo "REF=refs/tags/$TAG" >> "$GITHUB_ENV"
+            echo "TAG=$TAG" >> "$GITHUB_ENV"
           fi
-          echo "VERSION=${TAG#v}" >> "$GITHUB_ENV"
 
-      - name: Check out Octopus at ${{ env.TAG }}
+      - name: Check out Octopus
         uses: actions/checkout@v4
         with:
           repository: ${{ env.SOURCE_REPO }}
-          ref: refs/tags/${{ env.TAG }}
+          ref: ${{ env.REF }}
           path: octopus
           fetch-depth: 0
           token: ${{ secrets.OCTOPUS_REPO_TOKEN || github.token }}
 
-      - name: Check the app's version matches the tag
+      - name: Work out the version
+        id: plan
         working-directory: octopus
         run: |
           app=$(node -p "require('./src-tauri/tauri.conf.json').version")
-          if [ "$app" != "$VERSION" ]; then
-            echo "::error::tauri.conf.json says $app, the tag says $VERSION. Bump the version before tagging."
-            exit 1
+          sha=$(git rev-parse HEAD)
+          {
+            echo "channel=$CHANNEL"
+            echo "ref=$sha"
+          } >> "$GITHUB_OUTPUT"
+          if [ "$CHANNEL" = stable ]; then
+            version="${TAG#v}"
+            if [ "$app" != "$version" ]; then
+              echo "::error::tauri.conf.json says $app, the tag says $version. Bump the version before tagging."
+              exit 1
+            fi
+            {
+              echo "tag=$TAG"
+              echo "version=$version"
+              echo "base=$version"
+            } >> "$GITHUB_OUTPUT"
+            echo "Stable $version at $sha"
+            exit 0
           fi
+          # Preview: after the last stable tag, before the next release.
+          last=$(git describe --tags --abbrev=0 --match 'v[0-9]*' --exclude 'v*-*' HEAD 2>/dev/null || true)
+          if [ -n "$last" ]; then
+            count=$(git rev-list --count "$last..HEAD")
+            IFS=. read -r major minor patch <<< "${last#v}"
+            next="$major.$minor.$((patch + 1))"
+          else
+            count=$(git rev-list --count HEAD)
+            next="0.0.1"
+          fi
+          if [ "$count" = 0 ]; then
+            echo "::notice::$sha is $last itself: its stable release is the build, no preview."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          # A version already bumped on main (say 0.3.0) wins over the next patch.
+          base=$(printf '%s\n%s\n' "$next" "${app%%-*}" | sort -V | tail -1)
+          version="$base-preview.$count"
+          {
+            echo "tag=preview"
+            echo "version=$version"
+            echo "base=$base"
+            echo "last=$last"
+          } >> "$GITHUB_OUTPUT"
+          echo "Preview $version at $sha ($count commits since ${last:-the start})"
+
+  build:
+    name: Build and publish ${{ needs.plan.outputs.version }}
+    needs: plan
+    if: needs.plan.outputs.skip != 'true'
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      CHANNEL: ${{ needs.plan.outputs.channel }}
+      TAG: ${{ needs.plan.outputs.tag }}
+      VERSION: ${{ needs.plan.outputs.version }}
+      BASE: ${{ needs.plan.outputs.base }}
+      LAST: ${{ needs.plan.outputs.last }}
+    steps:
+      - name: Check out Octopus at ${{ needs.plan.outputs.ref }}
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.SOURCE_REPO }}
+          ref: ${{ needs.plan.outputs.ref }}
+          path: octopus
+          fetch-depth: 0
+          token: ${{ secrets.OCTOPUS_REPO_TOKEN || github.token }}
+
+      # Only in this build: the commit stays as it is.
+      - name: Set the preview version
+        if: env.CHANNEL == 'preview'
+        working-directory: octopus
+        run: |
+          node -e '
+            const fs = require("fs");
+            const path = "src-tauri/tauri.conf.json";
+            const conf = JSON.parse(fs.readFileSync(path, "utf8"));
+            conf.version = process.env.VERSION;
+            fs.writeFileSync(path, JSON.stringify(conf, null, 2) + "\n");
+          '
+          grep '"version"' src-tauri/tauri.conf.json
 
       - uses: actions/setup-node@v4
         with:
@@ -140,6 +253,9 @@ jobs:
           if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ] && [ -f src-tauri/tauri.release.conf.json ]; then
             config="--config src-tauri/tauri.release.conf.json"
             echo "UPDATER=1" >> "$GITHUB_ENV"
+          elif [ "$CHANNEL" = preview ]; then
+            echo "::error::A preview build is only an in-app update: it needs the updater key and tauri.release.conf.json."
+            exit 1
           else
             echo "::warning::No updater key or no tauri.release.conf.json at $TAG: this release has no in-app update."
           fi
@@ -151,8 +267,9 @@ jobs:
           mkdir -p out
           dmg=$(ls "$bundle"/dmg/*.dmg | head -1)
           cp "$dmg" out/
-          # A fixed name too, so releases/latest/download/Octopus.dmg always points at the newest one.
-          cp "$dmg" out/Octopus.dmg
+          # A fixed name too, so releases/latest/download/Octopus.dmg always points at the newest one
+          # (and releases/download/preview/Octopus-Preview.dmg at the newest preview).
+          if [ "$CHANNEL" = preview ]; then cp "$dmg" out/Octopus-Preview.dmg; else cp "$dmg" out/Octopus.dmg; fi
           ditto -c -k --keepParent "$bundle/macos/Octopus.app" "out/Octopus_${VERSION}_universal.app.zip"
           if [ "${UPDATER:-}" = 1 ]; then
             cp "$bundle/macos/Octopus.app.tar.gz" "out/Octopus_${VERSION}_universal.app.tar.gz"
@@ -164,9 +281,23 @@ jobs:
       - name: Write the release notes
         working-directory: octopus
         run: |
-          previous=$(git describe --tags --abbrev=0 --match 'v*' "$TAG^" 2>/dev/null || true)
+          if [ "$CHANNEL" = preview ]; then
+            previous="$LAST"
+          else
+            previous=$(git describe --tags --abbrev=0 --match 'v*' "$TAG^" 2>/dev/null || true)
+          fi
           {
-            if [ -n "$previous" ]; then
+            if [ "$CHANNEL" = preview ]; then
+              echo "## Preview of $BASE"
+              echo
+              echo "Built from $(git rev-parse --short HEAD), not a release: every change since ${previous:-the start}."
+              echo
+              if [ -n "$previous" ]; then
+                git log --no-merges --pretty='- %s' -n 100 "$previous..HEAD"
+              else
+                git log --no-merges --pretty='- %s' -n 30 HEAD
+              fi
+            elif [ -n "$previous" ]; then
               echo "## Changes since $previous"
               echo
               git log --no-merges --pretty='- %s' "$previous..$TAG"
@@ -202,6 +333,7 @@ jobs:
           cat out/latest.json
 
       - name: Publish the release
+        if: env.CHANNEL == 'stable'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -218,7 +350,7 @@ jobs:
       # Every release's notes, on the newest release: the update popup shows all that changed since the
       # installed version. Written after publishing, so it lists this release too.
       - name: Publish releases.json for the update popup
-        if: ${{ !contains(env.VERSION, '-') }}
+        if: env.CHANNEL == 'stable' && !contains(env.VERSION, '-')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -226,3 +358,49 @@ jobs:
             --jq '[.[] | select(.draft | not) | {tag: .tag_name, name, publishedAt: .published_at, prerelease, body}]' > releases.json
           jq -r '.[].tag' releases.json
           gh release upload "$TAG" releases.json --repo "$GITHUB_REPOSITORY" --clobber
+
+      # The preview channel follows the newest of both: this release, unless a preview of a later version
+      # is already out.
+      - name: Point the preview channel at this release
+        if: env.CHANNEL == 'stable' && env.UPDATER == '1' && !contains(env.VERSION, '-')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if ! gh release view preview --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "No preview release yet."
+            exit 0
+          fi
+          preview=$(gh release download preview --repo "$GITHUB_REPOSITORY" --pattern latest.json --output - 2>/dev/null | jq -r .version || true)
+          # Compares the x.y.z: a preview of this version comes before it, of a later one after.
+          if [ -n "$preview" ] && [ "$(printf '%s\n%s\n' "${preview%%-*}" "$VERSION" | sort -V | tail -1)" != "$VERSION" ]; then
+            echo "The preview channel is on $preview, newer than $VERSION: left as it is."
+            exit 0
+          fi
+          gh release upload preview out/latest.json --repo "$GITHUB_REPOSITORY" --clobber
+          echo "The preview channel now offers $VERSION (was ${preview:-nothing})."
+
+      # The rolling `preview` prerelease: never the latest release (the site and the stable channel read
+      # that), its files replaced by this build's. The update goes up first, latest.json after it, and the
+      # previous build's files are removed last, so the channel never points at a missing file.
+      - name: Publish the preview
+        if: env.CHANNEL == 'preview'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          stable=$(gh release view --repo "$GITHUB_REPOSITORY" --json tagName -q .tagName 2>/dev/null || true)
+          stable="${stable#v}"
+          if [ -n "$stable" ] && [ "$(printf '%s\n%s\n' "$stable" "$BASE" | sort -V | tail -1)" = "$stable" ]; then
+            echo "::notice::Octopus $stable is out, as new as this preview of $BASE: not published."
+            exit 0
+          fi
+          if ! gh release view preview --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create preview --repo "$GITHUB_REPOSITORY" --prerelease --latest=false \
+              --title "Octopus Preview" --notes-file notes.md
+          fi
+          (cd out && gh release upload preview $(ls | grep -v '^latest.json$') --repo "$GITHUB_REPOSITORY" --clobber)
+          gh release upload preview out/latest.json --repo "$GITHUB_REPOSITORY" --clobber
+          gh release edit preview --repo "$GITHUB_REPOSITORY" --prerelease --latest=false \
+            --title "Octopus Preview $VERSION" --notes-file notes.md
+          for name in $(gh release view preview --repo "$GITHUB_REPOSITORY" --json assets -q '.assets[].name'); do
+            [ -e "out/$name" ] || gh release delete-asset preview "$name" --repo "$GITHUB_REPOSITORY" --yes
+          done
