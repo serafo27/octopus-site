@@ -31,6 +31,7 @@
       <nav aria-label="Sections">
         <a href="#features">Features</a>
         <a href="#extensions">Extensions</a>
+        <a href="#mido">Mido</a>
         <a class="button small" href="#download">Download</a>
       </nav>
     </div>
@@ -63,6 +64,7 @@
       <a href="#delegate"><span class="dot" style="--c:#5aa9ff"></span>Delegation</a>
       <a href="#sessions"><span class="dot" style="--c:#4ec98a"></span>Sessions</a>
       <a href="#docs"><span class="dot" style="--c:#e6c14f"></span>Documentation</a>
+      <a href="#mido"><span class="dot" style="--c:#d98a3d"></span>Mido</a>
       <a href="#git"><span class="dot" style="--c:#f29a80"></span>Git and review</a>
       <a href="#notebooks"><span class="dot" style="--c:#4fb6a5"></span>Notebooks</a>
       <a href="#priorities"><span class="dot" style="--c:#6aa7f0"></span>Priorities</a>
@@ -124,13 +126,47 @@
         <div class="feature-copy">
           <p class="kicker">Documentation</p>
           <h2>Docs that stay next to the work.</h2>
-          <p>The Markdown in your repository, one tab away from tasks and terminals. Link a doc to a task and it's always at hand, for you and for the AI working on it. With Mido installed you get its full editor, with diagrams, math and comments.</p>
+          <p>The Markdown in your repository, one tab away from tasks and terminals. Link a doc to a task and it's always at hand, for you and for the AI working on it. With <a href="#mido">Mido</a> installed you get its full editor, with diagrams, math and comments.</p>
           <ul class="points">
             <li>Read, edit or both side by side</li>
             <li>Rename a document and every link to it follows</li>
           </ul>
         </div>
         <figure class="shot crop" style="--fr:82%;--fb:78%"><img src="assets/screens/docs-crop.webp" data-full="assets/screens/docs.webp" loading="lazy" alt="The Documentation tab showing docs/auth.md with headings, a list and a table." /></figure>
+      </div>
+    </section>
+
+    <!-- Mido: a companion app that plugs into Octopus -->
+    <section class="feature mido" id="mido">
+      <div class="wrap">
+        <div class="mido-head">
+          <div class="mido-pair" aria-hidden="true">
+            <img src="assets/icon.png" alt="" width="56" height="56" />
+            <span class="mido-plus">+</span>
+            <img src="assets/mido/icon.svg" alt="" width="56" height="56" />
+          </div>
+          <p class="kicker">Works with Mido</p>
+          <h2>Install Mido, and Octopus's docs get its whole editor.</h2>
+          <p>Octopus is modular: other apps by the same developer plug into it. <b>Mido</b> is a Markdown reader and editor for the Mac. Install it, and Octopus's Documentation tab runs Mido inside it, on the project's own folder. Nothing to set up: Octopus finds it by itself.</p>
+        </div>
+        <div class="feature-row">
+          <ul class="mido-gains">
+            <li><b>Diagrams and math</b>Mermaid diagrams, KaTeX formulas, GitHub alerts and highlighted code, rendered as you type.</li>
+            <li><b>Comments on the text</b>Threads on any passage, signed with your git name and shared with the repository.</li>
+            <li><b>Find your way</b>Tabs, an outline of every heading, and search across all of the project's docs.</li>
+            <li><b>Export and print</b>A standalone HTML page, or a PDF from the print panel.</li>
+            <li><b>Always up to date</b>Update Mido and Octopus gets the new version too. It follows Octopus's theme, and <i>Open in Mido</i> takes the project to the app.</li>
+          </ul>
+          <figure class="shot own-lights"><img src="assets/mido/read.webp" loading="lazy" alt="Mido showing architecture.md: the folder's files on the left, a front matter card, a note, a table and the document's outline on the right." /></figure>
+        </div>
+        <div class="mido-cta">
+          <a class="button mido-button" href="https://serafo27.github.io/mido/" rel="noopener">
+            <img src="assets/mido/icon.svg" alt="" width="20" height="20" />
+            Discover Mido
+          </a>
+          <a class="button ghost" href="https://serafo27.github.io/mido/#download" rel="noopener">Download Mido</a>
+        </div>
+        <p class="small mido-note">Free for macOS. Without Mido, Octopus uses its built-in editor.</p>
       </div>
     </section>
 
@@ -234,7 +270,7 @@
         <ul class="needs">
           <li>macOS on Apple Silicon or Intel</li>
           <li>An AI coding assistant, to delegate tasks (<a href="https://docs.claude.com/en/docs/claude-code/overview" rel="noopener">Claude Code</a>)</li>
-          <li>Optional: Mido, for the full documentation editor</li>
+          <li>Optional: <a href="https://serafo27.github.io/mido/" rel="noopener">Mido</a>, for the full documentation editor</li>
         </ul>
         <details class="gatekeeper">
           <summary>macOS says Octopus can't be opened</summary>
@@ -253,6 +289,7 @@
     <div class="wrap foot-row">
       <span class="brand"><img src="assets/icon.png" alt="" width="20" height="20" /> Octopus</span>
       <span class="small grow">The work hub that keeps your software projects in order.</span>
+      <a class="small" href="https://serafo27.github.io/mido/" rel="noopener">Mido</a>
       <a class="small" data-repo-link href="#">Releases on GitHub</a>
     </div>
   </footer>

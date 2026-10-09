@@ -115,6 +115,8 @@ h1 { font-size: clamp(2.3rem, 5.2vw, 4rem); line-height: 1.04; letter-spacing: -
     radial-gradient(circle at 46px 6px, #28c840 5.5px, transparent 6px);
 }
 @media (max-width: 700px) { .shot::before { transform: scale(0.6); transform-origin: left top; } }
+/* Screenshots that already show their own traffic lights */
+.shot.own-lights::before { display: none; }
 
 /* Crops: a part of the window, no frame, fading out where it was cut. --fl, --fr, --fb: where the
    fade from the left, to the right and to the bottom starts (none when unset). */
@@ -165,6 +167,31 @@ h2 { font-size: clamp(1.7rem, 2.9vw, 2.35rem); line-height: 1.12; letter-spacing
   .feature-row, .feature.flip .feature-row { grid-template-columns: 1fr; gap: 36px; }
   .feature.flip .feature-copy { order: 0; }
 }
+
+/* Mido: a companion app, shown in its own colours (green and orange, from its icon) */
+.mido {
+  --mido-green: #2d6a5f;
+  --mido-orange: #d98a3d;
+  --mido-cream: #f7f3ea;
+  background: radial-gradient(70% 50% at 50% 0%, rgba(45, 106, 95, 0.2), transparent 70%);
+}
+.mido .kicker { color: var(--mido-orange); }
+.mido-head { display: grid; gap: 18px; max-width: 760px; margin: 0 auto 56px; text-align: center; justify-items: center; }
+.mido-head > p:last-child { color: var(--fg-muted); font-size: 1.04rem; max-width: 62ch; text-wrap: pretty; }
+.mido-head b { color: var(--fg); }
+.mido-pair { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; }
+.mido-pair img { border-radius: 13px; box-shadow: 0 14px 36px -12px rgba(0, 0, 0, 0.7); }
+.mido-plus { font: 600 1.4rem var(--font-display); color: var(--fg-faint); }
+.mido .feature-row { grid-template-columns: minmax(0, 5fr) minmax(0, 8fr); }
+.mido-gains { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; }
+.mido-gains li { padding-left: 18px; border-left: 2px solid var(--mido-green); color: var(--fg-muted); font-size: 0.95rem; }
+.mido-gains b { display: block; font: 600 1.02rem var(--font-display); color: var(--fg); margin-bottom: 2px; }
+.mido-cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 56px; }
+.button.mido-button { background: var(--mido-green); color: var(--mido-cream); border-color: #3b8576; }
+.button.mido-button:hover { background: #357a6d; color: #fff; }
+.button.mido-button img { border-radius: 5px; }
+.mido-note { text-align: center; margin-top: 14px; color: var(--fg-faint); }
+@media (max-width: 920px) { .mido .feature-row { grid-template-columns: 1fr; } }
 
 /* More */
 .more { padding: 96px 0; border-top: 1px solid var(--line-soft); background: var(--bg-sunk); }
