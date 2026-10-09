@@ -116,6 +116,23 @@ h1 { font-size: clamp(2.3rem, 5.2vw, 4rem); line-height: 1.04; letter-spacing: -
 }
 @media (max-width: 700px) { .shot::before { transform: scale(0.6); transform-origin: left top; } }
 
+/* Crops: a part of the window, no frame, fading out where it was cut. --fl, --fr, --fb: where the
+   fade from the left, to the right and to the bottom starts (none when unset). */
+.shot.crop { background: none; border: 0; box-shadow: none; border-radius: 0; overflow: visible; }
+.shot.crop::before { display: none; }
+.shot.crop img {
+  border-radius: 10px 10px 0 0;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0, #000 var(--fl, 0%), #000 var(--fr, 100%), transparent 100%),
+    linear-gradient(to bottom, #000 var(--fb, 100%), transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(to right, transparent 0, #000 var(--fl, 0%), #000 var(--fr, 100%), transparent 100%),
+    linear-gradient(to bottom, #000 var(--fb, 100%), transparent 100%);
+  mask-composite: intersect;
+}
+.shot-hero { max-width: 1080px; margin-left: auto; margin-right: auto; }
+
 /* Feature index */
 .index { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding-top: 56px; padding-bottom: 24px; }
 .index a { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px; color: var(--fg-muted); text-decoration: none; font-size: 0.9rem; background: var(--bg-raised); }
@@ -140,8 +157,8 @@ h2 { font-size: clamp(1.7rem, 2.9vw, 2.35rem); line-height: 1.12; letter-spacing
 .points.states li::before { display: none; }
 .points.states .dot { width: 10px; height: 10px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--c) 18%, transparent); }
 
-.shot-pair { display: grid; gap: 0; position: relative; }
-.shot-pair .shot:last-child { width: 72%; margin: -26% 0 0 auto; position: relative; }
+.shot-pair { display: grid; gap: 28px; }
+.shot-pair .shot:last-child { width: 78%; justify-self: end; }
 
 @media (max-width: 920px) {
   .feature { padding: 72px 0; }

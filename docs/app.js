@@ -12,7 +12,7 @@
     const big = $("img", lightbox);
     for (const shot of $$(".shot img")) {
       shot.addEventListener("click", () => {
-        big.src = shot.currentSrc || shot.src;
+        big.src = shot.dataset.full || shot.currentSrc || shot.src;
         big.alt = shot.alt;
         lightbox.showModal();
       });

@@ -23,9 +23,6 @@ for scene in $SCENES; do
   echo "screens/out/$scene.png"
 done
 
-# For the site: WebP, 2400 px wide (sharp on Retina at the site's widest, a fraction of the PNG's weight).
-mkdir -p docs/assets/screens
-for scene in $SCENES; do
-  cwebp -quiet -q 88 -resize 2400 0 "screens/out/$scene.png" -o "docs/assets/screens/$scene.webp"
-done
+# For the site: every scene whole, and the crops the sections show (screens/crop.py).
+python3 screens/crop.py
 du -ch docs/assets/screens/*.webp | tail -1
