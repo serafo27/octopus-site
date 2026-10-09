@@ -16,7 +16,14 @@ name: Release Octopus
 #   APPLE_SIGNING_IDENTITY      optional: "Developer ID Application: Name (TEAMID)"
 #   APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID
 #                               optional: notarization (APPLE_PASSWORD is an app-specific password)
+#   TAURI_SIGNING_PRIVATE_KEY   the updater key (`npm run tauri signer generate`), whose public half is in
+#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD
+#                               Octopus's tauri.conf.json: the app installs only updates signed with it.
+#                               Without it the release has no in-app update (latest.json), only the downloads.
 # Without the Apple secrets the app is signed ad hoc: it runs, but Gatekeeper asks the user to allow it.
+#
+# For the in-app updater the release also carries latest.json (the update for tauri-plugin-updater: the
+# signed .app.tar.gz) and releases.json (every release's notes, for the changelog the update popup shows).
 
 on:
   repository_dispatch:
@@ -121,9 +128,22 @@ jobs:
             echo "::warning::No Apple certificate: the app is signed ad hoc and Gatekeeper will ask users to allow it."
           fi
 
+      # With the updater key, and a tag that has tauri.release.conf.json (createUpdaterArtifacts), Tauri
+      # also writes the app as a .app.tar.gz signed for the in-app updater.
       - name: Build the universal app
         working-directory: octopus
-        run: npm run tauri build -- --target universal-apple-darwin --bundles app,dmg
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          config=""
+          if [ -n "$TAURI_SIGNING_PRIVATE_KEY" ] && [ -f src-tauri/tauri.release.conf.json ]; then
+            config="--config src-tauri/tauri.release.conf.json"
+            echo "UPDATER=1" >> "$GITHUB_ENV"
+          else
+            echo "::warning::No updater key or no tauri.release.conf.json at $TAG: this release has no in-app update."
+          fi
+          npm run tauri build -- --target universal-apple-darwin --bundles app,dmg $config
 
       - name: Collect the files
         run: |
@@ -134,6 +154,10 @@ jobs:
           # A fixed name too, so releases/latest/download/Octopus.dmg always points at the newest one.
           cp "$dmg" out/Octopus.dmg
           ditto -c -k --keepParent "$bundle/macos/Octopus.app" "out/Octopus_${VERSION}_universal.app.zip"
+          if [ "${UPDATER:-}" = 1 ]; then
+            cp "$bundle/macos/Octopus.app.tar.gz" "out/Octopus_${VERSION}_universal.app.tar.gz"
+            cp "$bundle/macos/Octopus.app.tar.gz.sig" "out/Octopus_${VERSION}_universal.app.tar.gz.sig"
+          fi
           (cd out && shasum -a 256 * > SHA256SUMS.txt)
           ls -la out
 
@@ -152,6 +176,8 @@ jobs:
               git log --no-merges --pretty='- %s' -n 30 "$TAG"
             fi
             echo
+            # The update popup shows the notes up to here: the rest is for downloading by hand.
+            echo "<!-- install -->"
             case "$SIGNED" in
               notarized) echo "Signed and notarized by Apple." ;;
               signed) echo "Signed with a Developer ID, not notarized: macOS may ask you to confirm the first time." ;;
@@ -159,6 +185,21 @@ jobs:
             esac
           } > ../notes.md
           cat ../notes.md
+
+      # What tauri-plugin-updater reads from the newest release: the version, its notes and, for both
+      # architectures, the universal app and its signature.
+      - name: Write latest.json for the updater
+        if: env.UPDATER == '1'
+        run: |
+          name="Octopus_${VERSION}_universal.app.tar.gz"
+          url="https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/$name"
+          sig=$(cat "out/$name.sig")
+          notes=$(sed '/^<!-- install -->$/,$d' notes.md)
+          jq -n --arg v "$VERSION" --arg d "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --arg n "$notes" --arg u "$url" --arg s "$sig" \
+            '{version: $v, pub_date: $d, notes: $n, platforms: {
+               "darwin-aarch64": {url: $u, signature: $s},
+               "darwin-x86_64": {url: $u, signature: $s}}}' > out/latest.json
+          cat out/latest.json
 
       - name: Publish the release
         env:
@@ -173,3 +214,15 @@ jobs:
             gh release create "$TAG" out/* --repo "$GITHUB_REPOSITORY" \
               --title "Octopus $VERSION" --notes-file notes.md $prerelease
           fi
+
+      # Every release's notes, on the newest release: the update popup shows all that changed since the
+      # installed version. Written after publishing, so it lists this release too.
+      - name: Publish releases.json for the update popup
+        if: ${{ !contains(env.VERSION, '-') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+            --jq '[.[] | select(.draft | not) | {tag: .tag_name, name, publishedAt: .published_at, prerelease, body}]' > releases.json
+          jq -r '.[].tag' releases.json
+          gh release upload "$TAG" releases.json --repo "$GITHUB_REPOSITORY" --clobber
