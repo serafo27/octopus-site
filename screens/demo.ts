@@ -56,10 +56,13 @@ const T = (
     completedAt: status === "done" ? now - seq * hour : null,
     file: projectId ? `.octopus/tasks/${title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${seq}.md` : null,
     tags,
-    run: "",
+    archivedAt: null,
     page: "",
     board: "",
     projects: [],
+    tickets: [],
+    blocked: false,
+    blockedReason: "",
     ...extra,
   };
 };
@@ -68,13 +71,16 @@ export const tasks = [
   T("p-checkout", "Fix the login redirect", "doing", 2, ["auth"], {
     description:
       "After sign-in, users land on `/` instead of the page they came from.\n\n- [x] Keep `next` through the OAuth round trip\n- [x] Reject redirects to other hosts\n- [ ] Cover it with a test\n\nSee [Auth design](octopus://doc/docs/auth.md).",
-    run: "npm test -- auth",
+    tickets: ["https://acme.atlassian.net/browse/SHOP-142"],
   }),
   T("p-checkout", "Add Apple Pay to the payment step", "doing", 2, ["payments"]),
   T("p-checkout", "Refactor cart totals into one module", "review", 1, ["cart"]),
   T("p-checkout", "Show saved cards first", "todo", 1, ["payments"]),
   T("p-checkout", "Validate postcodes for the UK and Ireland", "todo", 0, ["address"]),
-  T("p-checkout", "Gift cards: partial payments", "todo", 3, ["payments"]),
+  T("p-checkout", "Gift cards: partial payments", "todo", 3, ["payments"], {
+    blocked: true,
+    blockedReason: "Waiting for the payment provider's sandbox",
+  }),
   T("p-checkout", "Explain why a coupon doesn't apply", "todo", 1, ["cart", "copy"]),
   T("p-checkout", "Retry failed webhooks with backoff", "review", 2, ["payments"]),
   T("p-checkout", "Move address autocomplete to the new API", "done", 1, ["address"]),
