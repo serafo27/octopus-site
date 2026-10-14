@@ -35,6 +35,13 @@ jobs:
           # so the first deploy doesn't fail with "Get Pages site failed / Not Found".
           enablement: true
 
+      # Browsers keep styles.css and the scripts for a while: a new deploy gives them new URLs.
+      - name: Version the stylesheet and scripts
+        run: |
+          version=${GITHUB_SHA::7}
+          find docs -name '*.html' -exec sed -i -E "s/(<(link|script)[^>]*(href|src)=\"[^\":]*\.(css|js))\"/\1?v=${version}\"/g" {} +
+          grep -rhoE '(styles|app|site-config)\.(css|js)\?v=[0-9a-f]+' docs | sort | uniq -c
+
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v3
         with:

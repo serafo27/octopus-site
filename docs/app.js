@@ -71,7 +71,7 @@
     if (note) note.textContent = `Version ${version}, ${date}. For Apple Silicon and Intel Macs.`;
 
     $("[data-release-summary]").textContent =
-      `Version ${version}, released ${date}. One download runs natively on Apple Silicon and Intel Macs.`;
+      `Free · Version ${version} · ${date}`;
     const alt = $("[data-download-alt]");
     alt.innerHTML = "";
     alt.append(
