@@ -18,6 +18,11 @@ Plain HTML, CSS and JavaScript, no build step:
 - `docs/app.js`: screenshots that open larger, and the download links (latest `.dmg`, older versions).
 - `docs/site-config.js`: the repository the releases are read from.
 - `docs/assets/screens/*.webp`: the screenshots, made by `screens/` (below).
+- `docs/extensions/index.html`: the guide to building an extension (tutorial, manifest, SDK, marketplaces).
+  Keep it in step with `src-tauri/extension-sdk/template/CLAUDE.md` in `octopus`.
+- `docs/sitemap.xml`, `docs/404.html`: for search engines. Add a new page to the sitemap, with its
+  `<link rel="canonical">`, title, description and Open Graph tags like the others.
+- `docs/assets/og.png`: the preview shown when the site is shared, made by `sh screens/og.sh` from `screens/og.html`.
 
 To preview it: `python3 -m http.server -d docs 8000`, then open http://localhost:8000.
 

@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>How to build an Octopus extension: tutorial, manifest and SDK</title>
+  <meta name="description" content="Build an extension for Octopus, the Mac work hub: create one with Claude or by hand, write its manifest and permissions, use the JavaScript SDK (tasks, Claude, HTTP, docs, menu bar) and share it in a team marketplace." />
+  <link rel="canonical" href="https://serafo27.github.io/octopus-site/extensions/" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#100f17" />
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Octopus" />
+  <meta property="og:url" content="https://serafo27.github.io/octopus-site/extensions/" />
+  <meta property="og:title" content="How to build an Octopus extension" />
+  <meta property="og:description" content="A step-by-step tutorial: a new section of Octopus in plain HTML and JavaScript, with the manifest, the permissions and the whole SDK." />
+  <meta property="og:image" content="https://serafo27.github.io/octopus-site/assets/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" type="image/png" href="../assets/favicon.png" />
+  <link rel="apple-touch-icon" href="../assets/icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "TechArticle",
+        "headline": "How to build an Octopus extension",
+        "description": "Create an extension for Octopus with Claude or by hand: the manifest, the permissions, the JavaScript SDK and team marketplaces.",
+        "url": "https://serafo27.github.io/octopus-site/extensions/",
+        "image": "https://serafo27.github.io/octopus-site/assets/og.png",
+        "inLanguage": "en",
+        "dateModified": "2026-10-14",
+        "author": { "@type": "Person", "name": "Serafino D'Angelillo" },
+        "about": { "@type": "SoftwareApplication", "name": "Octopus", "operatingSystem": "macOS", "applicationCategory": "DeveloperApplication" }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Octopus", "item": "https://serafo27.github.io/octopus-site/" },
+          { "@type": "ListItem", "position": 2, "name": "Build an extension", "item": "https://serafo27.github.io/octopus-site/extensions/" }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="top">
+    <div class="wrap top-row">
+      <a class="brand" href="../" aria-label="Octopus home">
+        <img src="../assets/icon.png" alt="" width="28" height="28" />
+        <span>Octopus</span>
+      </a>
+      <nav aria-label="Sections">
+        <a href="../#features">Features</a>
+        <a href="./" aria-current="page">Extensions</a>
+        <a href="../#mido">Mido</a>
+        <a class="button small" href="../#download">Download</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="guide-hero">
+      <div class="wrap">
+        <p class="crumbs"><a href="../">Octopus</a> › <a href="../#extensions">Extensions</a> › Build an extension</p>
+        <h1>Build an extension for Octopus.</h1>
+        <p class="lede">An extension is a new section of Octopus, made of plain HTML, CSS and JavaScript. This guide takes you from an empty folder to an extension your team installs in one click: the files, the permissions, the SDK and the marketplace.</p>
+      </div>
+    </section>
+
+    <div class="wrap guide">
+      <nav class="toc" aria-label="On this page">
+        <p>On this page</p>
+        <ol>
+          <li><a href="#what">What an extension is</a></li>
+          <li><a href="#with-claude">Create one with Claude</a></li>
+          <li><a href="#anatomy">The files</a></li>
+          <li><a href="#tutorial">Tutorial: a standup note</a></li>
+          <li><a href="#manifest">The manifest</a></li>
+          <li><a href="#permissions">Permissions</a></li>
+          <li><a href="#look">Look like Octopus</a></li>
+          <li><a href="#sdk">The SDK</a></li>
+          <li><a href="#menu-bar">Menu bar and windows</a></li>
+          <li><a href="#websites">A website as an extension</a></li>
+          <li><a href="#share">Share it with your team</a></li>
+          <li><a href="#rules">Rules and limits</a></li>
+        </ol>
+      </nav>
+
+      <article class="prose">
+        <section id="what">
+          <h2>What an extension is</h2>
+          <p>Octopus keeps your tasks, terminals, AI sessions, docs and git in one window. An extension adds what's missing for <i>your</i> work: your logs, an internal API, a dashboard, a standup summary. It gets a button of its own in the activity bar and a full section, beside the projects.</p>
+          <ul>
+            <li><b>Plain files, no build step.</b> A folder with a <code>manifest.json</code>, an <code>index.html</code> and whatever scripts and styles it needs.</li>
+            <li><b>Isolated.</b> It runs in a frame of its own and talks to Octopus only through its SDK, <code>window.octopus</code>.</li>
+            <li><b>Allowed by you.</b> It reaches only what its manifest asks for, and only after you say yes.</li>
+            <li><b>Live.</b> Octopus reloads it every time one of its files changes.</li>
+          </ul>
+        </section>
+
+        <section id="with-claude">
+          <h2>Create one with Claude</h2>
+          <p>The quickest way is to describe it. Octopus writes the extension with Claude Code next to a live preview, and you refine it by asking.</p>
+          <ol class="steps">
+            <li>Open the <b>Extensions</b> section and press <b>Create with Claude</b>.</li>
+            <li>Give it a <b>Name</b> and say <b>What it should do</b>, as precisely as you can: <i>“Query our Loki logs: ask in plain words, see the volume over time, group errors into patterns, open a trace.”</i> If you have more than one Claude account, pick the one that writes it.</li>
+            <li>A Claude Code session starts in the extension's folder, beside the page. Watch it take shape, and ask for changes in the session.</li>
+            <li>When it asks for permissions (a site, your tasks, Claude), Octopus shows you what and waits for your yes.</li>
+            <li>Press <b>Done</b>. To change it later, press <b>Edit</b> on its page: a new session picks up where you left off.</li>
+          </ol>
+          <div class="note">
+            <p>Every new extension comes with a <code>CLAUDE.md</code> that teaches Claude the rules and the whole SDK, so what it writes follows this guide. You can open the folder in your editor at any time and change it by hand.</p>
+          </div>
+        </section>
+
+        <section id="anatomy">
+          <h2>The files</h2>
+          <p>Every extension is a folder in <code>~/.octopus/extensions/</code>. The folder's name is the extension's id.</p>
+<pre class="code"><code>~/.octopus/extensions/standup/
+├── manifest.json   <span class="c"># name, icon, version, permissions</span>
+├── index.html      <span class="c"># the page Octopus shows</span>
+├── app.js          <span class="c"># your code, an ES module</span>
+├── CLAUDE.md       <span class="c"># the rules and the SDK, for Claude (made for you)</span>
+└── README.md       <span class="c"># optional: shown in the marketplace</span></code></pre>
+          <p>Octopus watches the folder: a new extension shows up as soon as its <code>manifest.json</code> is there, and a change to any file reloads it.</p>
+        </section>
+
+        <section id="tutorial">
+          <h2>Tutorial: a standup note</h2>
+          <p>Let's build one by hand. <b>Standup</b> lists what's in progress and in review across every project, opens a task on a click, and asks Claude for a three-line note you can paste in your team's chat. It needs two permissions: <code>tasks</code> and <code>claude</code>.</p>
+
+          <h3>1. The manifest</h3>
+          <p>Create the folder <code>~/.octopus/extensions/standup</code> and, in it:</p>
+          <span class="file">manifest.json</span>
+<pre class="code"><code>{
+  <span class="k">"name"</span>: <span class="s">"Standup"</span>,
+  <span class="k">"description"</span>: <span class="s">"What's in progress and in review, and a standup note written by Claude."</span>,
+  <span class="k">"icon"</span>: <span class="s">"comment-discussion"</span>,
+  <span class="k">"version"</span>: <span class="s">"0.1.0"</span>,
+  <span class="k">"author"</span>: <span class="s">"Your name"</span>,
+  <span class="k">"stage"</span>: <span class="s">"alpha"</span>,
+  <span class="k">"sdk"</span>: 1,
+  <span class="k">"permissions"</span>: { <span class="k">"tasks"</span>: true, <span class="k">"claude"</span>: true }
+}</code></pre>
+          <p>The Standup button appears in the activity bar right away. The first time you open it, Octopus asks whether it can read your tasks and use Claude.</p>
+
+          <h3>2. The page</h3>
+          <p>Link Octopus's stylesheet and SDK, both served by Octopus itself, then your module.</p>
+          <span class="file">index.html</span>
+<pre class="code"><code>&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="utf-8" /&gt;
+    &lt;title&gt;Standup&lt;/title&gt;
+    &lt;link rel="stylesheet" href="/__octopus/base.css" /&gt;
+    &lt;script src="/__octopus/sdk.js"&gt;&lt;/script&gt;
+    &lt;style&gt;
+      body { padding: 16px 20px; }
+      ul { list-style: none; padding: 0; display: grid; gap: 4px; }
+      li { padding: 6px 8px; border-radius: var(--radius-sm); cursor: pointer; }
+      li:hover { background: var(--bg-hover); }
+      #note { white-space: pre-wrap; }
+    &lt;/style&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;div class="toolbar"&gt;
+      &lt;button class="primary" id="write"&gt;Write the note&lt;/button&gt;
+      &lt;button class="ghost" id="copy"&gt;Copy&lt;/button&gt;
+    &lt;/div&gt;
+    &lt;ul id="tasks"&gt;&lt;/ul&gt;
+    &lt;div class="card" id="note"&gt;&lt;span class="muted"&gt;No note yet.&lt;/span&gt;&lt;/div&gt;
+    &lt;script type="module" src="app.js"&gt;&lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+          <h3>3. The code</h3>
+          <p>Wait for <code>octopus.ready()</code> before anything else: it says which extension this is, the theme and the projects.</p>
+          <span class="file">app.js</span>
+<pre class="code"><code><span class="k">const</span> { projects } = <span class="k">await</span> octopus.ready();
+<span class="k">const</span> projectName = Object.fromEntries(projects.map((p) =&gt; [p.id, p.name]));
+<span class="k">const</span> STATUS = { doing: <span class="s">"In progress"</span>, review: <span class="s">"Review"</span> };
+<span class="k">const</span> list = document.getElementById(<span class="s">"tasks"</span>);
+<span class="k">const</span> note = document.getElementById(<span class="s">"note"</span>);
+
+<span class="c">// The open work, across every project: a row per task, a click shows it on its board.</span>
+<span class="k">async function</span> load() {
+  <span class="k">const</span> tasks = (<span class="k">await</span> octopus.tasks.list()).filter((t) =&gt; STATUS[t.status]);
+  list.replaceChildren(...tasks.map((t) =&gt; {
+    <span class="k">const</span> li = document.createElement(<span class="s">"li"</span>);
+    <span class="k">const</span> badge = Object.assign(document.createElement(<span class="s">"span"</span>), { className: <span class="s">"badge"</span>, textContent: STATUS[t.status] });
+    <span class="k">const</span> where = Object.assign(document.createElement(<span class="s">"span"</span>), { className: <span class="s">"faint"</span>, textContent: projectName[t.projectId] ?? <span class="s">"No project"</span> });
+    li.append(badge, <span class="s">" "</span>, t.title, <span class="s">" "</span>, where);
+    li.onclick = () =&gt; octopus.tasks.reveal(t.id);
+    <span class="k">return</span> li;
+  }));
+  <span class="k">return</span> tasks;
+}
+
+<span class="k">const</span> write = document.getElementById(<span class="s">"write"</span>);
+write.onclick = <span class="k">async</span> () =&gt; {
+  write.disabled = <span class="k">true</span>;
+  note.textContent = <span class="s">"Claude is writing…"</span>;
+  <span class="k">try</span> {
+    <span class="k">const</span> lines = (<span class="k">await</span> load()).map((t) =&gt; <span class="s">`- ${STATUS[t.status]}: ${t.title} (${projectName[t.projectId] ?? "no project"})`</span>);
+    note.textContent = <span class="k">await</span> octopus.claude.ask(
+      <span class="s">`Write a standup note in three short lines from these tasks. Plain text, no preamble.\n${lines.join("\n")}`</span>,
+      { model: <span class="s">"haiku"</span> },
+    );
+  } <span class="k">catch</span> (err) {
+    note.textContent = err.message;
+  } <span class="k">finally</span> {
+    write.disabled = <span class="k">false</span>;
+  }
+};
+
+document.getElementById(<span class="s">"copy"</span>).onclick = () =&gt; {
+  octopus.copy(note.textContent);
+  octopus.toast(<span class="s">"Copied"</span>, <span class="s">"success"</span>);
+};
+
+<span class="c">// Fresh every time the section is shown.</span>
+octopus.on(<span class="s">"visible"</span>, (shown) =&gt; shown &amp;&amp; load());
+load();</code></pre>
+
+          <h3>4. Try it</h3>
+          <p>Save, and Octopus reloads the section. Press <b>Write the note</b>: a few seconds later Claude's note is there, ready to copy. Everything else is the same loop: change a file, look, change again. When it's done, drop <code>"stage"</code> from the manifest and <a href="#share">share it</a>.</p>
+          <div class="note">
+            <p><b>Something doesn't work?</b> Every SDK call returns a promise that rejects with an <code>Error</code> saying why: a permission the manifest doesn't declare, a host that isn't in <code>permissions.http</code>, no project open. Show <code>err.message</code> on the page while you build.</p>
+          </div>
+        </section>
+
+        <section id="manifest">
+          <h2>The manifest</h2>
+          <p><code>manifest.json</code> says what the extension is and what it may reach. Only <code>name</code> is required.</p>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Field</th><th>What it is</th></tr></thead>
+              <tbody>
+                <tr><td><code>name</code></td><td>Shown in the activity bar, the list and the marketplace.</td></tr>
+                <tr><td><code>description</code></td><td>One or two sentences on what it does. Claude reads it too, when it writes or edits the extension.</td></tr>
+                <tr><td><code>icon</code></td><td>A <a href="https://microsoft.github.io/vscode-codicons/dist/codicon.html" rel="noopener">codicon</a> name: <code>pulse</code>, <code>graph</code>, <code>database</code>, <code>output</code>, <code>beaker</code>…</td></tr>
+                <tr><td><code>version</code></td><td>Like <code>1.2.0</code>. Compared with the marketplace's to offer updates.</td></tr>
+                <tr><td><code>author</code></td><td>You, or your team.</td></tr>
+                <tr><td><code>stage</code></td><td><code>"alpha"</code> or <code>"beta"</code> while it isn't finished: a label in the list and the marketplace. Leave it out once it is.</td></tr>
+                <tr><td><code>entry</code></td><td>The page to show. Default <code>index.html</code>.</td></tr>
+                <tr><td><code>sdk</code></td><td>The SDK protocol it was written for: <code>1</code>.</td></tr>
+                <tr><td><code>permissions</code></td><td>What it may reach besides its own files. See below.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="permissions">
+          <h2>Permissions</h2>
+          <p>An extension starts with nothing but its own page. Each permission it declares is shown to you before it first runs, and Octopus asks again whenever the list grows. Every call is checked by Octopus's backend, not by the page. Ask only for what you need.</p>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Permission</th><th>Lets it</th></tr></thead>
+              <tbody>
+                <tr><td><code>http</code></td><td>Send requests through <code>octopus.http.fetch</code>, only to these URL prefixes: <code>["https://api.example.com/v1", "http://loki.internal"]</code>.</td></tr>
+                <tr><td><code>claude</code></td><td>Ask Claude Code with <code>octopus.claude.ask</code> and <code>chat</code>, and open Claude sessions in a project.</td></tr>
+                <tr><td><code>tasks</code></td><td>Read your tasks, create new ones, show one on its board.</td></tr>
+                <tr><td><code>terminals</code></td><td>See Octopus's terminals and what they show, read-only: nothing can be typed into them.</td></tr>
+                <tr><td><code>docs</code></td><td>Write Markdown and SVG files inside a project's documentation folder, and open them.</td></tr>
+                <tr><td><code>statusBar</code></td><td>Show an item of its own in the Mac's menu bar.</td></tr>
+                <tr><td><code>shared</code></td><td>Read what other extensions share, by their ids: <code>["calendar"]</code>.</td></tr>
+                <tr><td><code>webapp</code></td><td>Show a website itself. See <a href="#websites">A website as an extension</a>.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="look">
+          <h2>Look like Octopus</h2>
+          <p>Link <code>/__octopus/base.css</code> and the extension follows Octopus's theme, light or dark, as it changes. Use its CSS variables for every colour, never hard-coded ones:</p>
+          <ul>
+            <li>Backgrounds: <code>--bg-editor</code>, <code>--bg-widget</code>, <code>--bg-input</code>, <code>--bg-hover</code>, <code>--bg-selected</code>, and <code>--border</code>.</li>
+            <li>Text: <code>--fg</code>, <code>--fg-strong</code>, <code>--fg-muted</code>, <code>--fg-faint</code>, <code>--accent</code>, <code>--link</code>.</li>
+            <li>States: <code>--error</code>, <code>--warn</code>, <code>--success</code>; syntax colours <code>--hl-keyword</code>, <code>--hl-string</code>, <code>--hl-number</code>…</li>
+            <li>Shapes and type: <code>--radius-*</code>, <code>--font-ui</code>, <code>--font-mono</code>.</li>
+          </ul>
+          <p>Classes ready to use: <code>button.primary</code>, <code>button.ghost</code>, <code>.card</code>, <code>.badge</code> (with <code>.error</code>, <code>.warn</code>, <code>.success</code>), <code>.toolbar</code>, <code>.muted</code>, <code>.faint</code>, <code>.mono</code>, <code>.spinner</code>. Aim for a dense, quiet UI like an editor's: 13px text, small paddings, no big headers.</p>
+          <p>Drawing on a canvas or with a chart library? Redraw on <code>octopus.on("theme", …)</code>: the variables already hold the new colours.</p>
+        </section>
+
+        <section id="sdk">
+          <h2>The SDK</h2>
+          <p><code>/__octopus/sdk.js</code> defines <code>window.octopus</code>. Every call returns a promise.</p>
+
+          <h3>Start</h3>
+<pre class="code"><code><span class="k">const</span> { extension, theme, projects, workProjectId } = <span class="k">await</span> octopus.ready();</code></pre>
+
+          <h3>HTTP</h3>
+          <p>Made by Octopus, not the page: no CORS, and the Mac's network (your VPN) applies. Any status resolves; only a failure to connect rejects. Up to 64 MB.</p>
+<pre class="code"><code><span class="k">const</span> res = <span class="k">await</span> octopus.http.fetch(<span class="s">"https://api.example.com/v1/deploys?env=prod"</span>, {
+  method: <span class="s">"POST"</span>,                 <span class="c">// default GET</span>
+  headers: { Authorization: <span class="s">"Bearer …"</span> },
+  body: { any: <span class="s">"json"</span> },          <span class="c">// or a string</span>
+  timeoutMs: 60000,
+});
+res.status; res.ok; res.headers; res.text(); res.json();
+
+<span class="c">// Images and other binary files</span>
+<span class="k">const</span> img = <span class="k">await</span> octopus.http.fetch(<span class="s">"https://host/chart.png"</span>, { binary: <span class="k">true</span> });
+el.src = img.dataUrl();</code></pre>
+
+          <h3>Claude</h3>
+          <p>Claude Code without a terminal, in the Claude account of the project you're working on. It reads the extension's own files and uses skills, but can't run commands, edit files or reach the web: give it the data. An answer takes 5 to 30 seconds, so show progress; <code>"haiku"</code> and <code>"sonnet"</code> answer faster. Ask for JSON when you need data.</p>
+<pre class="code"><code><span class="k">const</span> answer = <span class="k">await</span> octopus.claude.ask(<span class="s">"Group these errors into patterns, as JSON: …"</span>, { model: <span class="s">"sonnet"</span> });
+
+<span class="c">// A conversation: each turn continues the last.</span>
+<span class="k">let</span> { text, session } = <span class="k">await</span> octopus.claude.chat(<span class="s">"…"</span>, { system: <span class="s">"You are…"</span> });
+({ text, session } = <span class="k">await</span> octopus.claude.chat(<span class="s">"and then?"</span>, { session }));
+
+<span class="c">// A full Claude Code session in a project's terminals, started with this prompt.</span>
+<span class="k">await</span> octopus.claude.open(<span class="s">"Investigate the 502s on checkout"</span>, { projectId, title: <span class="s">"502s"</span> });</code></pre>
+
+          <h3>Projects and tasks</h3>
+<pre class="code"><code><span class="k">const</span> projects = <span class="k">await</span> octopus.projects.list();       <span class="c">// [{ id, name, path, color }]</span>
+<span class="k">const</span> tasks = <span class="k">await</span> octopus.tasks.list({ projectId });  <span class="c">// [{ id, projectId, title, status, priority, tags }]</span>
+<span class="k">const</span> task = <span class="k">await</span> octopus.tasks.create({ title, body: <span class="s">"Markdown"</span>, projectId, priority: 2, tags: [<span class="s">"logs"</span>] });
+<span class="k">await</span> octopus.tasks.reveal(task.id);                    <span class="c">// shows it on its board</span></code></pre>
+          <p><code>status</code> is <code>todo</code>, <code>doing</code>, <code>review</code> or <code>done</code>; <code>priority</code> goes from 0 (low) to 3 (urgent). Without <code>projectId</code>, <code>list</code> returns every project's tasks.</p>
+
+          <h3>Terminals</h3>
+<pre class="code"><code><span class="k">const</span> terms = <span class="k">await</span> octopus.terminals.list();
+<span class="c">// [{ id, projectId, taskId, title, kind: "claude" | "shell", state, exitCode, startedAt, lastOutputAt, floating }]</span>
+<span class="k">const</span> text = <span class="k">await</span> octopus.terminals.read(terms[0].id, { lines: 300 });
+octopus.on(<span class="s">"terminals"</span>, (list) =&gt; {});   <span class="c">// opened, closed, or changed state</span></code></pre>
+          <p><code>state</code> is <code>working</code>, <code>idle</code>, <code>waiting</code> (it's waiting for you) or <code>ended</code>.</p>
+
+          <h3>Documentation</h3>
+          <p>A report and the charts it shows, written in a project's documentation folder (default: the project you're working on). An existing file is kept unless you pass <code>overwrite: true</code>.</p>
+<pre class="code"><code><span class="k">const</span> path = <span class="k">await</span> octopus.docs.write(<span class="s">"reports/2026-10-checkout.md"</span>, markdown, { projectId });
+<span class="k">await</span> octopus.docs.write(<span class="s">"reports/volume.svg"</span>, svg, { projectId });
+<span class="k">await</span> octopus.docs.open(path, { projectId });   <span class="c">// in the Documentation tab</span></code></pre>
+
+          <h3>Storage and sharing</h3>
+<pre class="code"><code><span class="k">await</span> octopus.storage.set(<span class="s">"savedQueries"</span>, [...]);        <span class="c">// JSON, kept by Octopus</span>
+<span class="k">const</span> saved = <span class="k">await</span> octopus.storage.get(<span class="s">"savedQueries"</span>);  <span class="c">// null if never set</span>
+
+<span class="c">// Publish data for other extensions, and read theirs (permissions.shared).</span>
+<span class="k">await</span> octopus.shared.set(<span class="s">"events"</span>, [...]);
+<span class="k">const</span> events = <span class="k">await</span> octopus.shared.get(<span class="s">"calendar"</span>, <span class="s">"events"</span>);
+octopus.on(<span class="s">"shared"</span>, ({ extension, key }) =&gt; {});
+<span class="k">const</span> exts = <span class="k">await</span> octopus.extensions.list();    <span class="c">// no permission needed</span></code></pre>
+
+          <h3>Small things</h3>
+<pre class="code"><code>octopus.toast(<span class="s">"Saved"</span>, <span class="s">"success"</span>);         <span class="c">// info, success, error</span>
+octopus.copy(text);                        <span class="c">// to the clipboard</span>
+octopus.openUrl(<span class="s">"https://…"</span>);              <span class="c">// in the browser</span>
+octopus.on(<span class="s">"theme"</span>, (theme) =&gt; {});        <span class="c">// colours already applied</span>
+octopus.on(<span class="s">"visible"</span>, (shown) =&gt; {});      <span class="c">// the section was shown or hidden</span></code></pre>
+        </section>
+
+        <section id="menu-bar">
+          <h2>Menu bar and windows</h2>
+          <h3>An item in the Mac's menu bar</h3>
+          <p>With the <code>statusBar</code> permission, an extension keeps an item in the menu bar, even while its section is hidden: Octopus loads it at start. Give it a timeline; Octopus shows the entry whose time has come and counts <code>{remaining}</code> down by itself.</p>
+<pre class="code"><code><span class="k">await</span> octopus.statusBar.set([
+  { text: <span class="s">"Standup in {remaining}"</span>, from: start - 15 * 60e3, to: start, color: <span class="s">"#5b8def"</span>, url },
+  { text: <span class="s">"Standup, {remaining} left"</span>, from: start, to: end, color: <span class="s">"#5b8def"</span>, url },
+], {
+  menu: [
+    { text: <span class="s">"Next in {remaining}"</span>, header: <span class="k">true</span>, to: start },
+    { text: <span class="s">"Join the call"</span>, url },
+    { separator: <span class="k">true</span> },
+    { text: <span class="s">"Settings…"</span>, id: <span class="s">"settings"</span>, show: <span class="k">true</span>, shortcut: <span class="s">"Cmd+,"</span> },
+  ],
+});
+octopus.on(<span class="s">"statusBar"</span>, ({ id }) =&gt; {});   <span class="c">// a row with that id was clicked</span>
+<span class="k">await</span> octopus.statusBar.clear();</code></pre>
+          <p>Menu rows can have a colour bar (<code>bar</code>: <code>solid</code>, <code>striped</code>, <code>outline</code>), an <code>icon</code> from the extension's files, a checkmark, a shortcut and a submenu (<code>items</code>, two levels).</p>
+
+          <h3>A window of its own</h3>
+          <p>Open a page of the extension in its own window, to keep beside other apps. It has the same SDK, and <code>octopus.window.detached</code> is true in it.</p>
+<pre class="code"><code><span class="k">await</span> octopus.window.open(<span class="s">"reader.html"</span>, { title: <span class="s">"News"</span>, width: 460, height: 780, alwaysOnTop: <span class="k">false</span> });
+octopus.window.close();   <span class="c">// from inside that window</span></code></pre>
+        </section>
+
+        <section id="websites">
+          <h2>A website as an extension</h2>
+          <p>To bring a site itself into Octopus (Slack, WhatsApp Web, your dashboards) instead of a page of your own, set <code>permissions.webapp</code> to its address. Octopus shows it in a view of its own, keeps you signed in, and counts what's unread from its title.</p>
+<pre class="code"><code>{
+  <span class="k">"name"</span>: <span class="s">"Chat"</span>,
+  <span class="k">"icon"</span>: <span class="s">"comment"</span>,
+  <span class="k">"permissions"</span>: {
+    <span class="k">"webapp"</span>: [
+      { <span class="k">"id"</span>: <span class="s">"slack"</span>, <span class="k">"name"</span>: <span class="s">"Slack"</span>, <span class="k">"url"</span>: <span class="s">"https://app.slack.com/client"</span>, <span class="k">"color"</span>: <span class="s">"#4A154B"</span> },
+      { <span class="k">"id"</span>: <span class="s">"telegram"</span>, <span class="k">"name"</span>: <span class="s">"Telegram"</span>, <span class="k">"url"</span>: <span class="s">"https://web.telegram.org/a/"</span>, <span class="k">"color"</span>: <span class="s">"#229ED9"</span> }
+    ]
+  }
+}</code></pre>
+          <p>A single site can be a plain address: <code>"webapp": "https://web.whatsapp.com"</code>. With several, you pin the ones you use as tabs. Add <code>"userAgent": "chrome"</code> for a site that says Safari isn't supported. The site can't reach Octopus, and Octopus can't read the site's content.</p>
+        </section>
+
+        <section id="share">
+          <h2>Share it with your team</h2>
+          <p>A <b>marketplace</b> is any git repository, or a folder on your Mac, holding extensions. Teammates add it once, install an extension in one click, and see updates when you publish a new version.</p>
+
+          <h3>Make a marketplace</h3>
+          <p>A repository with a folder per extension under <code>extensions/</code> already works. To give it a name and choose the folders, add <code>octopus-marketplace.json</code> at its root:</p>
+          <span class="file">octopus-marketplace.json</span>
+<pre class="code"><code>{
+  <span class="k">"name"</span>: <span class="s">"team"</span>,
+  <span class="k">"description"</span>: <span class="s">"The checkout team's tools"</span>,
+  <span class="k">"extensions"</span>: [{ <span class="k">"path"</span>: <span class="s">"extensions/standup"</span> }, { <span class="k">"path"</span>: <span class="s">"extensions/log-analyzer"</span> }]
+}</code></pre>
+          <p>A <code>README.md</code> in an extension's folder is shown on its page in the marketplace.</p>
+
+          <h3>Publish</h3>
+          <ol class="steps">
+            <li>In <b>Extensions › Marketplaces</b>, press <b>Add a marketplace</b> and paste its git address (<code>git@github.com:team/octopus-extensions.git</code> or <code>https://…</code>) or a folder's path.</li>
+            <li>Open your extension's details and press <b>Publish…</b>. Pick the marketplace and the new version.</li>
+            <li>Octopus commits it in a temporary worktree, so your own checkout is never touched, and pushes a branch <code>extension/&lt;id&gt;-&lt;version&gt;</code> for review (a merge request on GitLab, the compare page on GitHub), or straight onto the branch.</li>
+          </ol>
+
+          <h3>Install and update</h3>
+          <p>Teammates add the same marketplace and press <b>Install</b>. <b>Check for updates</b> pulls every marketplace and says what's new; a higher <code>version</code> shows up as an update. Editing an installed extension makes it your own copy.</p>
+        </section>
+
+        <section id="rules">
+          <h2>Rules and limits</h2>
+          <ul>
+            <li><b>No build step.</b> HTML, CSS and ES modules loaded as they are. No npm, no bundler.</li>
+            <li><b>No CDN.</b> The page runs under a Content Security Policy that allows only its own files. A library is fine as a file copied into the folder, like <code>vendor/chart.umd.js</code>.</li>
+            <li><b>No network but <code>octopus.http.fetch</code>.</b> A plain <code>fetch()</code> to another host fails, and so do remote images: fetch them with <code>binary: true</code> and use <code>dataUrl()</code>.</li>
+            <li><b>Only its own folder.</b> An extension never changes Octopus itself: the SDK is all it gets.</li>
+            <li><b>Storage that lasts.</b> <code>localStorage</code> works, but <code>octopus.storage</code> is the one Octopus keeps.</li>
+          </ul>
+
+          <div class="guide-next">
+            <h2>Ready to build yours?</h2>
+            <p>Download Octopus, open Extensions and press Create with Claude, or start from the Standup tutorial above.</p>
+            <a class="button primary" href="../#download">Download Octopus</a>
+          </div>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <div class="wrap foot-row">
+      <span class="brand"><img src="../assets/icon.png" alt="" width="20" height="20" /> Octopus</span>
+      <span class="small grow">The work hub that keeps your software projects in order.</span>
+      <a class="small" href="../">Home</a>
+      <a class="small" href="https://serafo27.github.io/mido/" rel="noopener">Mido</a>
+      <a class="small" href="https://github.com/serafo27/octopus-site/releases">Releases on GitHub</a>
+    </div>
+  </footer>
+</body>
+</html>

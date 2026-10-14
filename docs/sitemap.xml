@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The site's pages, for search engines. Submitted in Google Search Console; add a page here when you add one. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://serafo27.github.io/octopus-site/</loc>
+    <lastmod>2026-10-14</lastmod>
+  </url>
+  <url>
+    <loc>https://serafo27.github.io/octopus-site/extensions/</loc>
+    <lastmod>2026-10-14</lastmod>
+  </url>
+</urlset>
