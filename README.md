@@ -15,6 +15,7 @@ Plain HTML, CSS and JavaScript, no build step:
 
 - `docs/index.html`: the page, with one section per feature, each with a screenshot of the app.
 - `docs/styles.css`: colours from the app icon, dark like the screenshots.
+  Pages link it (and `app.js`) as `styles.css?v=N`: raise `N` when you change it, or browsers keep the old one.
 - `docs/app.js`: screenshots that open larger, and the download links (latest `.dmg`, older versions).
 - `docs/site-config.js`: the repository the releases are read from.
 - `docs/assets/screens/*.webp`: the screenshots, made by `screens/` (below).
