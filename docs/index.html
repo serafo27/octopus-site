@@ -13,12 +13,12 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Octopus" />
   <meta property="og:url" content="https://serafo27.github.io/octopus-site/" />
-  <meta property="og:title" content="Octopus: every project in order" />
+  <meta property="og:title" content="Octopus: where all your work comes together" />
   <meta property="og:description" content="Tasks, terminals, AI sessions, docs and git for every project, organized in one Mac app that keeps itself up to date." />
   <meta property="og:image" content="https://serafo27.github.io/octopus-site/assets/og.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="Octopus, every project in order: the task board of a project, with To do, In progress and Review columns." />
+  <meta property="og:image:alt" content="Octopus, where all your work comes together: the task board of a project, with To do, In progress and Review columns." />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" type="image/png" href="assets/favicon.png" />
   <link rel="apple-touch-icon" href="assets/icon.png" />
@@ -50,9 +50,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=7" />
   <script src="site-config.js"></script>
-  <script src="app.js" defer></script>
+  <script src="app.js?v=7" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -76,9 +76,9 @@
     <!-- Hero -->
     <section class="hero">
       <div class="wrap hero-copy">
-        <img class="hero-icon" src="assets/icon.png" alt="" width="88" height="88" />
-        <h1>Every project in order. Everything under&nbsp;control.</h1>
-        <p class="lede">Octopus is the work hub for your software projects. Tasks, terminals, AI sessions, docs and git live in one place, and Octopus keeps them up to date, so you always know where everything stands.</p>
+        <img class="hero-icon" src="assets/icon.png" alt="" width="104" height="104" />
+        <h1>One hub. All your work, in one&nbsp;place.</h1>
+        <p class="lede">Tasks, terminals, AI sessions, docs and git from every project, together in one place that keeps itself up to date. And with extensions, it becomes whatever your work needs.</p>
         <div class="cta">
           <a class="button primary" href="#download" data-download-link>
             <svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16"><path fill="currentColor" d="M11.2 8.4c0-1.6 1.3-2.4 1.4-2.5-.8-1.1-2-1.3-2.4-1.3-1-.1-2 .6-2.5.6s-1.3-.6-2.2-.6C4.4 4.6 3.3 5.3 2.7 6.4c-1.2 2.1-.3 5.2.9 6.9.6.8 1.2 1.7 2.1 1.7.8 0 1.2-.5 2.2-.5s1.3.5 2.2.5c.9 0 1.5-.8 2-1.7.7-1 .9-1.9.9-2-.1 0-1.8-.7-1.8-2.9ZM9.6 3.6c.5-.6.8-1.3.7-2.1-.7 0-1.5.5-2 1.1-.4.5-.8 1.3-.7 2.1.8 0 1.5-.4 2-1.1Z"/></svg>
@@ -286,9 +286,33 @@
           </li>
           <li>
             <h3>Share with your team</h3>
-            <p>Publish it to your team's marketplace, any git repository. Teammates install it in one click and get every update.</p>
+            <p>Publish it to a marketplace, any git repository. Teammates install it in one click and get every update.</p>
           </li>
         </ol>
+        <div class="markets">
+          <div class="markets-head">
+            <h3>Public and private marketplaces, side by side</h3>
+            <p>Add as many as you need. Each keeps its own extensions and updates.</p>
+          </div>
+          <div class="markets-grid">
+            <div class="market-card public">
+              <div class="market-top">
+                <span class="market-icon"><svg aria-hidden="true" viewBox="0 0 16 16" width="18" height="18"><g fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.2"/><path d="M1.8 8h12.4M8 1.8c1.9 2 2.6 4 2.6 6.2S9.9 12.2 8 14.2C6.1 12.2 5.4 10.2 5.4 8S6.1 3.8 8 1.8Z"/></g></svg></span>
+                <div><b>Public</b><code>github.com/…/octopus-extensions</code></div>
+              </div>
+              <p>General-purpose extensions, open to everyone.</p>
+              <ul class="market-chips"><li>Calendar</li><li>Jira</li><li>Pomodoro</li></ul>
+            </div>
+            <div class="market-card private">
+              <div class="market-top">
+                <span class="market-icon"><svg aria-hidden="true" viewBox="0 0 16 16" width="18" height="18"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="3" y="7" width="10" height="7.2" rx="1.6"/><path d="M5.3 7V5a2.7 2.7 0 0 1 5.4 0v2"/></g></svg></span>
+                <div><b>Private</b><code>gitlab.your-company.com/team/…</code></div>
+              </div>
+              <p>Your team's own tools, reached with your git access. They never leave it.</p>
+              <ul class="market-chips"><li>Feature flags</li><li>SQL scratchpad</li><li>On call</li></ul>
+            </div>
+          </div>
+        </div>
         <div class="ext-cta">
           <a class="button primary" href="extensions/">Learn to build an extension</a>
           <span class="small">A step-by-step tutorial, the manifest and the whole SDK.</span>
@@ -300,7 +324,7 @@
     <section class="download" id="download">
       <div class="wrap download-card">
         <img src="assets/icon.png" alt="" width="96" height="96" />
-        <h2>Put your work in order.</h2>
+        <h2>Bring all your work together.</h2>
         <p class="lede" data-release-summary>Looking up the latest version…</p>
         <div class="cta">
           <a class="button primary" href="#" data-download-link hidden>
@@ -329,6 +353,10 @@
       <div class="wrap releases-wrap" data-releases-wrap hidden>
         <h3>Earlier versions</h3>
         <ul class="releases" data-releases></ul>
+        <details class="releases-more" data-releases-more hidden>
+          <summary data-releases-more-label>More versions</summary>
+          <ul class="releases" data-releases-more-list></ul>
+        </details>
       </div>
     </section>
 
@@ -348,7 +376,7 @@
           </div>
         </div>
         <ul class="apps" aria-label="The apps you support">
-          <li><a href="./"><img src="assets/icon.png" alt="" width="40" height="40" /><span><b>Octopus</b>Every software project in order</span></a></li>
+          <li><a href="./"><img src="assets/icon.png" alt="" width="40" height="40" /><span><b>Octopus</b>All your work, in one place</span></a></li>
           <li><a href="https://serafo27.github.io/mido/" rel="noopener"><img src="assets/mido/icon.svg" alt="" width="40" height="40" /><span><b>Mido</b>Markdown reader and editor for the Mac</span></a></li>
           <li><a href="https://viboai.net" rel="noopener"><span class="app-mark" style="--c:#5aa9ff">V</span><span><b>Vibo</b>From a goal to a plan, each task in its own worktree</span></a></li>
           <li><a href="https://serafo27.github.io/dibo-releases/" rel="noopener"><span class="app-mark" style="--c:#4fb6a5">D</span><span><b>Dibo</b>A local-first workspace for databases and APIs</span></a></li>
@@ -361,7 +389,7 @@
   <footer class="foot">
     <div class="wrap foot-row">
       <span class="brand"><img src="assets/icon.png" alt="" width="20" height="20" /> Octopus</span>
-      <span class="small grow">The work hub that keeps your software projects in order.</span>
+      <span class="small grow">The work hub where all your work comes together.</span>
       <a class="small" href="extensions/">Build an extension</a>
       <a class="small" href="https://serafo27.github.io/mido/" rel="noopener">Mido</a>
       <a class="small" href="https://ko-fi.com/heptartle" rel="noopener">Support on Ko-fi</a>
@@ -373,5 +401,6 @@
     <img alt="" />
     <button type="button" class="lightbox-close" aria-label="Close">×</button>
   </dialog>
+  <script src="to-top.js?v=7" defer></script>
 </body>
 </html>

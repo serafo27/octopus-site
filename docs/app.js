@@ -79,12 +79,19 @@
       Object.assign(document.createElement("a"), { href: latest.html_url, textContent: "What's new in this version" }),
     );
 
+    // The two before the latest in sight, the rest folded under "N more versions".
     const list = $("[data-releases]");
+    const moreList = $("[data-releases-more-list]");
     list.innerHTML = "";
-    const older = usable.slice(1, 8);
+    moreList.innerHTML = "";
+    const older = usable.slice(1);
     if (!older.length) return;
     $("[data-releases-wrap]").hidden = false;
-    for (const r of older) {
+    const more = $("[data-releases-more]");
+    more.hidden = older.length <= 2;
+    $("[data-releases-more-label]").textContent =
+      `${older.length - 2} more ${older.length - 2 === 1 ? "version" : "versions"}`;
+    older.forEach((r, i) => {
       const li = document.createElement("li");
       const file = pickDmg(r.assets);
       li.append(
@@ -93,8 +100,8 @@
         Object.assign(document.createElement("a"), { href: r.html_url, textContent: "Notes" }),
         Object.assign(document.createElement("a"), { href: file.browser_download_url, textContent: `Download ${file.name}` }),
       );
-      list.append(li);
-    }
+      (i < 2 ? list : moreList).append(li);
+    });
   }
 
   async function loadReleases() {
