@@ -135,8 +135,8 @@ h1 { font-size: clamp(2.3rem, 5.2vw, 4rem); line-height: 1.04; letter-spacing: -
   mask-composite: intersect;
 }
 /* After .shot, whose margin: 0 would undo the space below the buttons */
-.shot-hero { max-width: 1080px; margin: 88px auto 0; }
-@media (max-width: 600px) { .shot-hero { margin-top: 56px; } }
+.shot-hero { max-width: 1080px; margin: 56px auto 0; }
+@media (max-width: 600px) { .shot-hero { margin-top: 40px; } }
 
 /* Feature index */
 .index { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding-top: 56px; padding-bottom: 24px; }
