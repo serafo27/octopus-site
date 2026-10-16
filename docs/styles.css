@@ -92,7 +92,8 @@ kbd { margin-right: 2px; }
   pointer-events: none;
 }
 .hero-copy { text-align: center; display: grid; justify-items: center; gap: 22px; position: relative; }
-.hero-icon { border-radius: 20px; box-shadow: 0 18px 50px -12px rgba(160, 131, 255, 0.45); }
+/* drop-shadow, not box-shadow: icon.png has a transparent margin, and the glow must follow the squircle */
+.hero-icon { width: 104px; height: 104px; filter: drop-shadow(0 12px 28px rgba(160, 131, 255, 0.4)); }
 h1 { font-size: clamp(2.3rem, 5.2vw, 4rem); line-height: 1.04; letter-spacing: -0.03em; font-weight: 700; max-width: 21ch; text-wrap: balance; }
 .lede { font-size: 1.18rem; color: var(--fg-muted); max-width: 54ch; text-wrap: pretty; }
 .cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 6px; }
