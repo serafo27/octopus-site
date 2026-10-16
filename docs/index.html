@@ -50,9 +50,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=6" />
+  <link rel="stylesheet" href="styles.css?v=7" />
   <script src="site-config.js"></script>
-  <script src="app.js?v=6" defer></script>
+  <script src="app.js?v=7" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -289,7 +289,30 @@
             <p>Publish it to a marketplace, any git repository. Teammates install it in one click and get every update.</p>
           </li>
         </ol>
-        <p class="ext-markets">Add marketplaces from public and private sources alike: general-purpose extensions from public repositories, your team's own from a private one on GitHub or GitLab. They sit side by side but stay apart, so what you build in private never leaves it.</p>
+        <div class="markets">
+          <div class="markets-head">
+            <h3>Public and private marketplaces, side by side</h3>
+            <p>Add as many as you need. Each keeps its own extensions and updates.</p>
+          </div>
+          <div class="markets-grid">
+            <div class="market-card public">
+              <div class="market-top">
+                <span class="market-icon"><svg aria-hidden="true" viewBox="0 0 16 16" width="18" height="18"><g fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.2"/><path d="M1.8 8h12.4M8 1.8c1.9 2 2.6 4 2.6 6.2S9.9 12.2 8 14.2C6.1 12.2 5.4 10.2 5.4 8S6.1 3.8 8 1.8Z"/></g></svg></span>
+                <div><b>Public</b><code>github.com/…/octopus-extensions</code></div>
+              </div>
+              <p>General-purpose extensions, open to everyone.</p>
+              <ul class="market-chips"><li>Calendar</li><li>Jira</li><li>Pomodoro</li></ul>
+            </div>
+            <div class="market-card private">
+              <div class="market-top">
+                <span class="market-icon"><svg aria-hidden="true" viewBox="0 0 16 16" width="18" height="18"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="3" y="7" width="10" height="7.2" rx="1.6"/><path d="M5.3 7V5a2.7 2.7 0 0 1 5.4 0v2"/></g></svg></span>
+                <div><b>Private</b><code>gitlab.your-company.com/team/…</code></div>
+              </div>
+              <p>Your team's own tools, reached with your git access. They never leave it.</p>
+              <ul class="market-chips"><li>Feature flags</li><li>SQL scratchpad</li><li>On call</li></ul>
+            </div>
+          </div>
+        </div>
         <div class="ext-cta">
           <a class="button primary" href="extensions/">Learn to build an extension</a>
           <span class="small">A step-by-step tutorial, the manifest and the whole SDK.</span>
@@ -378,5 +401,6 @@
     <img alt="" />
     <button type="button" class="lightbox-close" aria-label="Close">×</button>
   </dialog>
+  <script src="to-top.js?v=7" defer></script>
 </body>
 </html>
