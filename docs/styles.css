@@ -92,14 +92,14 @@ kbd { margin-right: 2px; }
   pointer-events: none;
 }
 .hero-copy { text-align: center; display: grid; justify-items: center; gap: 22px; position: relative; }
-/* drop-shadow, not box-shadow: icon.png has a transparent margin, and the glow must follow the squircle */
-.hero-icon { width: 104px; height: 104px; filter: drop-shadow(0 12px 28px rgba(160, 131, 255, 0.4)); }
+/* drop-shadow, not box-shadow: icon.png has a transparent margin, and the glow must start at the squircle's
+   edge, all round (a tight one on the edge, a wide one around it) */
+.hero-icon { width: 104px; height: 104px; filter: drop-shadow(0 0 2px rgba(160, 131, 255, 0.6)) drop-shadow(0 0 22px rgba(160, 131, 255, 0.4)); }
 h1 { font-size: clamp(2.3rem, 5.2vw, 4rem); line-height: 1.04; letter-spacing: -0.03em; font-weight: 700; max-width: 21ch; text-wrap: balance; }
 .lede { font-size: 1.18rem; color: var(--fg-muted); max-width: 54ch; text-wrap: pretty; }
 .cta { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 6px; }
 .cta-note { font-size: 0.85rem; color: var(--fg-faint); margin-top: -8px; }
-.shot-hero { margin-top: 64px; position: relative; }
-@media (max-width: 600px) { .hero { padding-top: 56px; } .lede { font-size: 1.05rem; } .shot-hero { margin-top: 40px; } }
+@media (max-width: 600px) { .hero { padding-top: 56px; } .lede { font-size: 1.05rem; } }
 
 /* Screenshots: the app's window, its traffic lights drawn over the title bar's empty corner */
 .shot {
@@ -134,7 +134,9 @@ h1 { font-size: clamp(2.3rem, 5.2vw, 4rem); line-height: 1.04; letter-spacing: -
     linear-gradient(to bottom, #000 var(--fb, 100%), transparent 100%);
   mask-composite: intersect;
 }
-.shot-hero { max-width: 1080px; margin-left: auto; margin-right: auto; }
+/* After .shot, whose margin: 0 would undo the space below the buttons */
+.shot-hero { max-width: 1080px; margin: 88px auto 0; }
+@media (max-width: 600px) { .shot-hero { margin-top: 56px; } }
 
 /* Feature index */
 .index { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding-top: 56px; padding-bottom: 24px; }

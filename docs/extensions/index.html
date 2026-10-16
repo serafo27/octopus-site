@@ -92,6 +92,7 @@
           <li><a href="#menu-bar">Menu bar and windows</a></li>
           <li><a href="#websites">A website as an extension</a></li>
           <li><a href="#share">Share it with your team</a></li>
+          <li><a href="#dependencies">Extensions that need others</a></li>
           <li><a href="#rules">Rules and limits</a></li>
         </ol>
       </nav>
@@ -114,7 +115,7 @@
           <ol class="steps">
             <li>Open the <b>Extensions</b> section and press <b>Create with Claude</b>.</li>
             <li>Give it a <b>Name</b> and say <b>What it should do</b>, as precisely as you can: <i>“Query our Loki logs: ask in plain words, see the volume over time, group errors into patterns, open a trace.”</i> If you have more than one Claude account, pick the one that writes it.</li>
-            <li>A Claude Code session starts in the extension's folder, beside the page. Watch it take shape, and ask for changes in the session.</li>
+            <li>A Claude Code session starts in the extension's folder, beside the page. Watch it take shape, and ask for changes in the session. From its header the Claude pane folds to a strip at the side or expands over the page, and stays as you left it.</li>
             <li>When it asks for permissions (a site, your tasks, Claude), Octopus shows you what and waits for your yes.</li>
             <li>Press <b>Done</b>. To change it later, press <b>Edit</b> on its page: a new session picks up where you left off.</li>
           </ol>
@@ -255,6 +256,7 @@ load();</code></pre>
                 <tr><td><code>entry</code></td><td>The page to show. Default <code>index.html</code>.</td></tr>
                 <tr><td><code>sdk</code></td><td>The SDK protocol it was written for: <code>1</code>.</td></tr>
                 <tr><td><code>permissions</code></td><td>What it may reach besides its own files. See below.</td></tr>
+                <tr><td><code>dependencies</code></td><td>The extensions it needs, with the oldest version that will do: <code>{ "calendar": "1.2.0" }</code>. See <a href="#dependencies">Extensions that need others</a>.</td></tr>
               </tbody>
             </table>
           </div>
@@ -268,8 +270,8 @@ load();</code></pre>
               <thead><tr><th>Permission</th><th>Lets it</th></tr></thead>
               <tbody>
                 <tr><td><code>http</code></td><td>Send requests through <code>octopus.http.fetch</code>, only to these URL prefixes: <code>["https://api.example.com/v1", "http://loki.internal"]</code>.</td></tr>
-                <tr><td><code>claude</code></td><td>Ask Claude Code with <code>octopus.claude.ask</code> and <code>chat</code>, and open Claude sessions in a project.</td></tr>
-                <tr><td><code>tasks</code></td><td>Read your tasks, create new ones, show one on its board.</td></tr>
+                <tr><td><code>claude</code></td><td>Ask Claude Code with <code>octopus.claude.ask</code> and <code>chat</code>, open Claude sessions in a project, show them in its page and close the ones it opened.</td></tr>
+                <tr><td><code>tasks</code></td><td>Read your tasks, create new ones, change them (status, priority, tags, blocked, archived), show one on its board.</td></tr>
                 <tr><td><code>terminals</code></td><td>See Octopus's terminals and what they show, read-only: nothing can be typed into them.</td></tr>
                 <tr><td><code>docs</code></td><td>Write Markdown and SVG files inside a project's documentation folder, and open them.</td></tr>
                 <tr><td><code>statusBar</code></td><td>Show an item of its own in the Mac's menu bar.</td></tr>
@@ -322,22 +324,41 @@ el.src = img.dataUrl();</code></pre>
 <span class="k">let</span> { text, session } = <span class="k">await</span> octopus.claude.chat(<span class="s">"…"</span>, { system: <span class="s">"You are…"</span> });
 ({ text, session } = <span class="k">await</span> octopus.claude.chat(<span class="s">"and then?"</span>, { session }));
 
-<span class="c">// A full Claude Code session in a project's terminals, started with this prompt.</span>
-<span class="k">await</span> octopus.claude.open(<span class="s">"Investigate the 502s on checkout"</span>, { projectId, title: <span class="s">"502s"</span> });</code></pre>
+<span class="c">// A full Claude Code session in a project's terminals, started with this prompt. It resolves with</span>
+<span class="c">// the terminal's id; background: true keeps the extension in front.</span>
+<span class="k">const</span> termId = <span class="k">await</span> octopus.claude.open(<span class="s">"Investigate the 502s on checkout"</span>, { projectId, title: <span class="s">"502s"</span>, background: <span class="k">true</span> });</code></pre>
+          <p>To show that session inside your page, see <a href="#claude-in-page">Claude in your page</a>.</p>
 
           <h3>Projects and tasks</h3>
 <pre class="code"><code><span class="k">const</span> projects = <span class="k">await</span> octopus.projects.list();       <span class="c">// [{ id, name, path, color }]</span>
-<span class="k">const</span> tasks = <span class="k">await</span> octopus.tasks.list({ projectId });  <span class="c">// [{ id, projectId, title, status, priority, tags }]</span>
+<span class="k">const</span> tasks = <span class="k">await</span> octopus.tasks.list({ projectId });
+<span class="c">// [{ id, projectId, title, status, priority, tags, blocked, blockedReason, archived }]</span>
 <span class="k">const</span> task = <span class="k">await</span> octopus.tasks.create({ title, body: <span class="s">"Markdown"</span>, projectId, priority: 2, tags: [<span class="s">"logs"</span>] });
+<span class="k">await</span> octopus.tasks.update(task.id, { status: <span class="s">"doing"</span>, blocked: <span class="k">true</span>, blockedReason: <span class="s">"Waiting for QA"</span> });
+<span class="k">await</span> octopus.tasks.update(task.id, { status: <span class="s">"done"</span>, archived: <span class="k">true</span> });
 <span class="k">await</span> octopus.tasks.reveal(task.id);                    <span class="c">// shows it on its board</span></code></pre>
-          <p><code>status</code> is <code>todo</code>, <code>doing</code>, <code>review</code> or <code>done</code>; <code>priority</code> goes from 0 (low) to 3 (urgent). Without <code>projectId</code>, <code>list</code> returns every project's tasks.</p>
+          <p><code>status</code> is <code>todo</code>, <code>doing</code>, <code>review</code> or <code>done</code>; <code>priority</code> goes from 0 (low) to 3 (urgent). Without <code>projectId</code>, <code>list</code> returns every project's tasks. <code>update</code> changes only what you give it (<code>title</code>, <code>body</code>, <code>status</code>, <code>priority</code>, <code>tags</code>, <code>blocked</code> and <code>blockedReason</code>, <code>archived</code>), and only a done task can be archived.</p>
+
+          <h3>Git</h3>
+          <p>Open a branch's review in the project's Git tab: everything it changes against the branch it goes into, as a merge request shows it. No permission needed, since only you see the code. By default: the project you're working on, its checked-out branch and the remote's default branch.</p>
+<pre class="code"><code><span class="k">const</span> { branch, target } = <span class="k">await</span> octopus.git.review({ projectId, branch: <span class="s">"feature/dark-mode"</span>, target: <span class="s">"main"</span> });</code></pre>
 
           <h3>Terminals</h3>
 <pre class="code"><code><span class="k">const</span> terms = <span class="k">await</span> octopus.terminals.list();
 <span class="c">// [{ id, projectId, taskId, title, kind: "claude" | "shell", state, exitCode, startedAt, lastOutputAt, floating }]</span>
 <span class="k">const</span> text = <span class="k">await</span> octopus.terminals.read(terms[0].id, { lines: 300 });
-octopus.on(<span class="s">"terminals"</span>, (list) =&gt; {});   <span class="c">// opened, closed, or changed state</span></code></pre>
+octopus.on(<span class="s">"terminals"</span>, (list) =&gt; {});   <span class="c">// opened, closed, or changed state</span>
+<span class="k">await</span> octopus.terminals.reveal(id);          <span class="c">// shows it in its project's Terminals, focused</span></code></pre>
           <p><code>state</code> is <code>working</code>, <code>idle</code>, <code>waiting</code> (it's waiting for you) or <code>ended</code>.</p>
+
+          <h3 id="claude-in-page">Claude in your page</h3>
+          <p>A Claude session your extension opened can be shown right inside its page: Octopus draws its own terminal over an element of yours and follows it as it moves, resizes, shows or hides. You type in it as in Terminals; the page still can't. When the page lets it go, the session goes back to its project's Terminals.</p>
+<pre class="code"><code><span class="k">const</span> termId = <span class="k">await</span> octopus.claude.open(<span class="s">"Review the failing tests"</span>, { projectId, background: <span class="k">true</span> });
+<span class="k">const</span> view = <span class="k">await</span> octopus.terminals.embed(termId, document.getElementById(<span class="s">"term"</span>));
+view.focus();
+view.dispose();                              <span class="c">// back to Terminals</span>
+<span class="k">await</span> octopus.terminals.close(termId);       <span class="c">// ends it: only sessions this extension opened</span></code></pre>
+          <p>It works in the extension's section, not in a window of its own.</p>
 
           <h3>Documentation</h3>
           <p>A report and the charts it shows, written in a project's documentation folder (default: the project you're working on). An existing file is kept unless you pass <code>overwrite: true</code>.</p>
@@ -427,6 +448,24 @@ octopus.window.close();   <span class="c">// from inside that window</span></cod
 
           <h3>Install and update</h3>
           <p>Teammates add the same marketplace and press <b>Install</b>. <b>Check for updates</b> pulls every marketplace and says what's new; a higher <code>version</code> shows up as an update. Editing an installed extension makes it your own copy.</p>
+        </section>
+
+        <section id="dependencies">
+          <h2>Extensions that need others</h2>
+          <p>An extension can build on another: a standup that reads the meetings a calendar extension shares, say. Name them in <code>dependencies</code>, each with the oldest version that will do:</p>
+          <span class="file">manifest.json</span>
+<pre class="code"><code>{
+  <span class="k">"name"</span>: <span class="s">"Standup"</span>,
+  <span class="k">"permissions"</span>: { <span class="k">"shared"</span>: [<span class="s">"calendar"</span>] },
+  <span class="k">"dependencies"</span>: { <span class="k">"calendar"</span>: <span class="s">"1.2.0"</span>, <span class="k">"jira"</span>: <span class="s">"*"</span> }
+}</code></pre>
+          <p><code>"*"</code> takes any version. A plain list of ids works too, <code>["calendar", "jira"]</code>, and so does <code>[{ "id": "calendar", "version": "1.2.0" }]</code>.</p>
+          <ul>
+            <li><b>Installing.</b> Octopus asks once, listing what it will install, update or turn on first, looking in the extension's own marketplace before the others. Then it installs them in order, and the extension last. If one can't be found, or no version is new enough, it says so before anything changes.</li>
+            <li><b>In its details.</b> An extension shows what it needs and which installed extensions need it.</li>
+            <li><b>Uninstalling or turning one off.</b> If others need it, Octopus says which before it goes.</li>
+          </ul>
+          <p>A dependency can still be missing or turned off, for example in an extension you copied by hand. Check <code>octopus.extensions.list()</code> and tell the user what's needed rather than failing silently.</p>
         </section>
 
         <section id="rules">
