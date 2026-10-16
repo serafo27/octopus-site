@@ -50,9 +50,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=3" />
+  <link rel="stylesheet" href="styles.css?v=6" />
   <script src="site-config.js"></script>
-  <script src="app.js?v=3" defer></script>
+  <script src="app.js?v=6" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -286,9 +286,10 @@
           </li>
           <li>
             <h3>Share with your team</h3>
-            <p>Publish it to your team's marketplace, any git repository. Teammates install it in one click and get every update.</p>
+            <p>Publish it to a marketplace, any git repository. Teammates install it in one click and get every update.</p>
           </li>
         </ol>
+        <p class="ext-markets">Add marketplaces from public and private sources alike: general-purpose extensions from public repositories, your team's own from a private one on GitHub or GitLab. They sit side by side but stay apart, so what you build in private never leaves it.</p>
         <div class="ext-cta">
           <a class="button primary" href="extensions/">Learn to build an extension</a>
           <span class="small">A step-by-step tutorial, the manifest and the whole SDK.</span>
@@ -300,7 +301,7 @@
     <section class="download" id="download">
       <div class="wrap download-card">
         <img src="assets/icon.png" alt="" width="96" height="96" />
-        <h2>Put your work in order.</h2>
+        <h2>Bring all your work together.</h2>
         <p class="lede" data-release-summary>Looking up the latest version…</p>
         <div class="cta">
           <a class="button primary" href="#" data-download-link hidden>
@@ -329,6 +330,10 @@
       <div class="wrap releases-wrap" data-releases-wrap hidden>
         <h3>Earlier versions</h3>
         <ul class="releases" data-releases></ul>
+        <details class="releases-more" data-releases-more hidden>
+          <summary data-releases-more-label>More versions</summary>
+          <ul class="releases" data-releases-more-list></ul>
+        </details>
       </div>
     </section>
 
@@ -361,7 +366,7 @@
   <footer class="foot">
     <div class="wrap foot-row">
       <span class="brand"><img src="assets/icon.png" alt="" width="20" height="20" /> Octopus</span>
-      <span class="small grow">The work hub that keeps your software projects in order.</span>
+      <span class="small grow">The work hub where all your work comes together.</span>
       <a class="small" href="extensions/">Build an extension</a>
       <a class="small" href="https://serafo27.github.io/mido/" rel="noopener">Mido</a>
       <a class="small" href="https://ko-fi.com/heptartle" rel="noopener">Support on Ko-fi</a>

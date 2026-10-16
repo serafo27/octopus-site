@@ -23,7 +23,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../styles.css?v=3" />
+  <link rel="stylesheet" href="../styles.css?v=6" />
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -91,7 +91,7 @@
           <li><a href="#sdk">The SDK</a></li>
           <li><a href="#menu-bar">Menu bar and windows</a></li>
           <li><a href="#websites">A website as an extension</a></li>
-          <li><a href="#share">Share it with your team</a></li>
+          <li><a href="#share">Marketplaces</a></li>
           <li><a href="#dependencies">Extensions that need others</a></li>
           <li><a href="#rules">Rules and limits</a></li>
         </ol>
@@ -426,8 +426,8 @@ octopus.window.close();   <span class="c">// from inside that window</span></cod
         </section>
 
         <section id="share">
-          <h2>Share it with your team</h2>
-          <p>A <b>marketplace</b> is any git repository, or a folder on your Mac, holding extensions. Teammates add it once, install an extension in one click, and see updates when you publish a new version.</p>
+          <h2>Marketplaces</h2>
+          <p>A <b>marketplace</b> is any git repository, or a folder on your Mac, holding extensions. You add it once, install an extension in one click, and see updates when a new version is published. Add as many as you like: public ones for extensions anyone can use, and private ones for your team's own tools, which never leave them.</p>
 
           <h3>Make a marketplace</h3>
           <p>A repository with a folder per extension under <code>extensions/</code> already works. To give it a name and choose the folders, add <code>octopus-marketplace.json</code> at its root:</p>
@@ -438,11 +438,23 @@ octopus.window.close();   <span class="c">// from inside that window</span></cod
   <span class="k">"extensions"</span>: [{ <span class="k">"path"</span>: <span class="s">"extensions/standup"</span> }, { <span class="k">"path"</span>: <span class="s">"extensions/log-analyzer"</span> }]
 }</code></pre>
           <p>A <code>README.md</code> in an extension's folder is shown on its page in the marketplace.</p>
+          <p>Push it wherever fits who should see it: a public repository on GitHub for everyone, or a private one on GitHub or your company's GitLab for your team. Octopus works with both the same way.</p>
+
+          <h3 id="add-marketplace">Add a marketplace</h3>
+          <ol class="steps">
+            <li>Open the <b>Extensions</b> section and go to <b>Marketplaces</b>.</li>
+            <li>Paste the repository's git address and press <b>Add</b>: <code>https://github.com/acme/octopus-extensions.git</code> for a public one, <code>git@gitlab.example.com:team/octopus-extensions.git</code> for a private one. Or press <b>Choose a folder…</b> to use a folder on your Mac as it is.</li>
+            <li>Octopus clones it and lists its extensions, each with the marketplace it comes from. Add a public marketplace and your team's private one side by side: they stay separate, and each extension updates only from its own.</li>
+          </ol>
+          <div class="note">
+            <p><b>Private repositories</b> use the git access you already have: your SSH key or the credentials git remembers for that host. Octopus never asks for a password, so if <code>git clone</code> works in your terminal, adding it works too. A folder is read in place, and if it's a git working copy, Refresh only fast-forwards it, never merging over your changes.</p>
+          </div>
+          <p><b>Refresh</b> on a marketplace pulls what's been published since; <b>Remove</b> forgets it, leaving the extensions you installed from it in place.</p>
 
           <h3>Publish</h3>
           <ol class="steps">
-            <li>In <b>Extensions › Marketplaces</b>, press <b>Add a marketplace</b> and paste its git address (<code>git@github.com:team/octopus-extensions.git</code> or <code>https://…</code>) or a folder's path.</li>
-            <li>Open your extension's details and press <b>Publish…</b>. Pick the marketplace and the new version.</li>
+            <li>Add the marketplace, if you haven't yet (see <a href="#add-marketplace">Add a marketplace</a>). To publish you need to be able to push to it.</li>
+            <li>Open your extension's details and press <b>Publish…</b>. Pick the marketplace (a private one for your team's tools, a public one to share with everyone) and the new version.</li>
             <li>Octopus commits it in a temporary worktree, so your own checkout is never touched, and pushes a branch <code>extension/&lt;id&gt;-&lt;version&gt;</code> for review (a merge request on GitLab, the compare page on GitHub), or straight onto the branch.</li>
           </ol>
 
@@ -491,7 +503,7 @@ octopus.window.close();   <span class="c">// from inside that window</span></cod
   <footer class="foot">
     <div class="wrap foot-row">
       <span class="brand"><img src="../assets/icon.png" alt="" width="20" height="20" /> Octopus</span>
-      <span class="small grow">The work hub that keeps your software projects in order.</span>
+      <span class="small grow">The work hub where all your work comes together.</span>
       <a class="small" href="../">Home</a>
       <a class="small" href="https://serafo27.github.io/mido/" rel="noopener">Mido</a>
       <a class="small" href="https://ko-fi.com/heptartle" rel="noopener">Support on Ko-fi</a>
