@@ -50,9 +50,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=7" />
+  <link rel="stylesheet" href="styles.css?v=8" />
   <script src="site-config.js"></script>
-  <script src="app.js?v=7" defer></script>
+  <script src="app.js?v=8" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -86,7 +86,6 @@
           </a>
           <a class="button ghost" href="#features">See how it works</a>
         </div>
-        <p class="cta-note" data-download-note>Free. For Apple Silicon and Intel Macs.</p>
       </div>
       <div class="wrap wrap-wide">
         <figure class="shot crop shot-hero" style="--fb:62%"><img src="assets/screens/hero-board.webp" width="1800" height="641" data-full="assets/screens/board.webp" alt="The checkout project's task board: To do, In progress, Review and Done, with priorities, tags and the sessions working on each task." fetchpriority="high" /></figure>
@@ -295,14 +294,15 @@
             <p>Add as many as you need. Each keeps its own extensions and updates.</p>
           </div>
           <div class="markets-grid">
-            <div class="market-card public">
+            <a class="market-card public" href="https://github.com/serafo27/octopus-extensions-marketplace">
               <div class="market-top">
                 <span class="market-icon"><svg aria-hidden="true" viewBox="0 0 16 16" width="18" height="18"><g fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6.2"/><path d="M1.8 8h12.4M8 1.8c1.9 2 2.6 4 2.6 6.2S9.9 12.2 8 14.2C6.1 12.2 5.4 10.2 5.4 8S6.1 3.8 8 1.8Z"/></g></svg></span>
-                <div><b>Public</b><code>github.com/…/octopus-extensions</code></div>
+                <div><b>Public, and already in Octopus</b><code>github.com/serafo27/octopus-extensions-marketplace</code></div>
               </div>
-              <p>General-purpose extensions, open to everyone.</p>
-              <ul class="market-chips"><li>Calendar</li><li>Jira</li><li>Pomodoro</li></ul>
-            </div>
+              <p>Octopus's own extensions, open to everyone. It's added the first time Octopus opens: install what you like in one click.</p>
+              <ul class="market-chips"><li>Calendar</li><li>Daily</li><li>Messaging</li><li>JSON Explorer</li><li>Pets</li></ul>
+              <span class="market-link">Browse it on GitHub &rarr;</span>
+            </a>
             <div class="market-card private">
               <div class="market-top">
                 <span class="market-icon"><svg aria-hidden="true" viewBox="0 0 16 16" width="18" height="18"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="3" y="7" width="10" height="7.2" rx="1.6"/><path d="M5.3 7V5a2.7 2.7 0 0 1 5.4 0v2"/></g></svg></span>
