@@ -48,8 +48,6 @@
       Object.assign(document.createElement("a"), { href: releasesUrl, textContent: "Watch the releases on GitHub" }),
       " to hear when it is.",
     );
-    const note = $("[data-download-note]");
-    if (note) note.textContent = "Coming soon for Apple Silicon and Intel Macs.";
     for (const label of $$("[data-download-label]")) label.textContent = "Download for Mac";
   }
 
@@ -67,8 +65,6 @@
       a.hidden = false;
     }
     for (const label of $$("[data-download-label]")) label.textContent = `Download Octopus ${version}`;
-    const note = $("[data-download-note]");
-    if (note) note.textContent = `Version ${version}, ${date}. For Apple Silicon and Intel Macs.`;
 
     $("[data-release-summary]").textContent =
       `Free · Version ${version} · ${date}`;
